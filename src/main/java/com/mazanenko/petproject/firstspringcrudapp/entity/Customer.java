@@ -5,13 +5,17 @@ public class Customer extends Person {
     private int phone;
     private String email;
 
+    private DeliveryAddress deliveryAddress;
+
     public Customer() {}
 
-    public Customer(int id, String name, String surname, int phone, String email) {
+    public Customer(int id, String name, String surname, int phone, String email,
+                    DeliveryAddress deliveryAddress) {
         super(id, name);
         this.surname = surname;
         this.phone = phone;
         this.email = email;
+        this.deliveryAddress = deliveryAddress;
     }
 
     public String getSurname() {
