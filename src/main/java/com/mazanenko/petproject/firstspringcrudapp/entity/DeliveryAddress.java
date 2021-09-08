@@ -68,4 +68,16 @@ public class DeliveryAddress {
     public void setNote(String note) {
         this.note = note;
     }
+
+    @Override
+    public String toString() {
+        return "DeliveryAddress{" +
+                "customerId=" + customerId +
+                ", country='" + country + '\'' +
+                ", city='" + city + '\'' +
+                ", street='" + street + '\'' +
+                ", houseNumber=" + houseNumber +
+                ", note='" + note + '\'' +
+                '}';
+    }
 }

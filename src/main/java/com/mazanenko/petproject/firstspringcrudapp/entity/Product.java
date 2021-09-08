@@ -50,4 +50,51 @@ public abstract class Product {
     public void setAvailableQuantity(String availableQuantity) {
         this.availableQuantity = availableQuantity;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + getId() +
+                ", name='" + getName() + '\'' +
+                ", availableQuantity='" + getAvailableQuantity() + '\'' +
+                '}';
+    }
+
+    class ProductPhoto {
+        private int id;
+        private String URL;
+        private int productId;
+
+        public ProductPhoto() {}
+
+        public ProductPhoto(int id, String URL, int productId) {
+            this.id = id;
+            this.URL = URL;
+            this.productId = productId;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getURL() {
+            return URL;
+        }
+
+        public void setURL(String URL) {
+            this.URL = URL;
+        }
+
+        public int getProductId() {
+            return productId;
+        }
+
+        public void setProductId(int productId) {
+            this.productId = productId;
+        }
+    }
 }

@@ -36,4 +36,12 @@ public class ProductPhoto {
     public void setProductId(int productId) {
         this.productId = productId;
     }
+
+    @Override
+    public String toString() {
+        return "ProductPhoto{" +
+                "id=" + getId() +
+                ", productId=" + getProductId() +
+                '}';
+    }
 }

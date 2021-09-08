@@ -59,4 +59,13 @@ public class Customer extends Person {
     public void setCart(Cart cart) {
         this.cart = cart;
     }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id=" + getId() +
+                ", name='" + getName() + '\'' +
+                "surname='" + getSurname() +
+                '}';
+    }
 }

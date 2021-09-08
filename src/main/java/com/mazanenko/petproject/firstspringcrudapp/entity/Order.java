@@ -49,4 +49,13 @@ public class Order {
     public void setProduct(Product product) {
         this.product = product;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "cartId=" + getCartId() +
+                ", productId=" + getProductId() +
+                ", product quantity=" + getQuantity() +
+                '}';
+    }
 }
