@@ -1,21 +1,21 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
-import java.util.List;
 
 public class Order {
     private int cartId;
     private int productId;
     private int quantity;
 
-    private List<Product> productList;
+    private Product product;
 
-    public Order() {}
+    public Order() {
+    }
 
-    public Order(int cartId, int productId, int quantity, List<Product> productList) {
+    public Order(int cartId, int productId, int quantity, Product product) {
         this.cartId = cartId;
         this.productId = productId;
         this.quantity = quantity;
-        this.productList = productList;
+        this.product = product;
     }
 
     public int getCartId() {
@@ -42,11 +42,11 @@ public class Order {
         this.quantity = quantity;
     }
 
-    public List<Product> getProductList() {
-        return productList;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

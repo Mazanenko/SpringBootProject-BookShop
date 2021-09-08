@@ -1,17 +1,20 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Cart {
     private int id;
     private int customerId;
 
-    private Order order;
+    private List<Order> orderList = new ArrayList<>();
 
     public Cart() {}
 
-    public Cart(int id, int customerId, Order order) {
+    public Cart(int id, int customerId, List<Order> orderList) {
         this.id = id;
         this.customerId = customerId;
-        this.order = order;
+        this.orderList = orderList;
     }
 
     public int getId() {
@@ -30,11 +33,11 @@ public class Cart {
         this.customerId = customerId;
     }
 
-    public Order getOrder() {
-        return order;
+    public List<Order> getOrderList() {
+        return orderList;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setOrderList(List<Order> orderList) {
+        this.orderList = orderList;
     }
 }
