@@ -1,6 +1,6 @@
 package com.mazanenko.petproject.firstspringcrudapp.dao.impl;
 
-import com.mazanenko.petproject.firstspringcrudapp.dao.BookDAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.DAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.mapper.BookMapper;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class BookDAOImpl implements BookDAO {
+public class BookDAO implements DAO<Book> {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public BookDAOImpl(JdbcTemplate jdbcTemplate) {
+    public BookDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

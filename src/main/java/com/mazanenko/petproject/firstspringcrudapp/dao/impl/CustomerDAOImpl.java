@@ -1,6 +1,6 @@
 package com.mazanenko.petproject.firstspringcrudapp.dao.impl;
 
-import com.mazanenko.petproject.firstspringcrudapp.dao.CustomerDAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.DAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.mapper.CustomerMapper;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class CustomerDAOImpl implements CustomerDAO {
+public class CustomerDAOImpl implements DAO<Customer> {
 
     private final JdbcTemplate jdbcTemplate;
 
