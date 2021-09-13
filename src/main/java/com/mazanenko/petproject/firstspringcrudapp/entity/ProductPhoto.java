@@ -17,10 +17,6 @@ public class ProductPhoto {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getURL() {
         return URL;
     }

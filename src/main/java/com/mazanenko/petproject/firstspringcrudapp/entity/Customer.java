@@ -1,8 +1,10 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
+import java.util.EnumSet;
+
 public class Customer extends Person {
     private String surname;
-    private int phone;
+    private String phone;
     private String email;
 
     private DeliveryAddress deliveryAddress;
@@ -10,7 +12,7 @@ public class Customer extends Person {
 
     public Customer() {}
 
-    public Customer(int id, String name, String surname, int phone, String email,
+    public Customer(int id, String name, String surname, String phone, String email,
                     DeliveryAddress deliveryAddress, Cart cart) {
         super(id, name);
         this.surname = surname;
@@ -28,11 +30,11 @@ public class Customer extends Person {
         this.surname = surname;
     }
 
-    public int getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(int phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 

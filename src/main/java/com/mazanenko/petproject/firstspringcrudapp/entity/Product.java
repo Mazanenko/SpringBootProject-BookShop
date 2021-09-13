@@ -23,10 +23,6 @@ public abstract class Product {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -65,7 +61,7 @@ public abstract class Product {
         private String URL;
         private int productId;
 
-        public ProductPhoto() {}
+        protected ProductPhoto() {}
 
         public ProductPhoto(int id, String URL, int productId) {
             this.id = id;
