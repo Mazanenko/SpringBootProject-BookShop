@@ -28,7 +28,8 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public Customer read(int id) {
-        return jdbcTemplate.query ("SELECT * FROM customer WHERE id = ?", new CustomerMapper(), id).stream().findAny().orElse(null);
+        return jdbcTemplate.query ("SELECT * FROM customer WHERE id = ?", new CustomerMapper(), id)
+                .stream().findAny().orElse(null);
     }
 
     @Override

@@ -4,13 +4,13 @@ public abstract class Product {
     private int id;
     private String name;
     private String description;
-    private String availableQuantity;
+    private int availableQuantity;
 
     private ProductPhoto productPhoto;
 
     public Product() {}
 
-    public Product(int id, String name, String description, String availableQuantity,
+    public Product(int id, String name, String description, int availableQuantity,
                    ProductPhoto productPhoto) {
         this.id = id;
         this.name = name;
@@ -39,11 +39,11 @@ public abstract class Product {
         this.description = description;
     }
 
-    public String getAvailableQuantity() {
+    public int getAvailableQuantity() {
         return availableQuantity;
     }
 
-    public void setAvailableQuantity(String availableQuantity) {
+    public void setAvailableQuantity(int availableQuantity) {
         this.availableQuantity = availableQuantity;
     }
 
