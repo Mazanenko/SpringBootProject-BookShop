@@ -11,6 +11,7 @@ public class BookMapper implements RowMapper<Book> {
     public Book mapRow(ResultSet resultSet, int i) throws SQLException {
         Book book = new Book();
 
+        book.setId(resultSet.getInt("id"));
         book.setName(resultSet.getString("name"));
         book.setAuthor(resultSet.getString("author"));
         book.setGenre(resultSet.getString("genre"));
