@@ -1,6 +1,7 @@
 package com.mazanenko.petproject.firstspringcrudapp.service.impl;
 
 import com.mazanenko.petproject.firstspringcrudapp.dao.impl.BookDAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.impl.ProductPhotoDAO;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
 import com.mazanenko.petproject.firstspringcrudapp.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +11,13 @@ import java.util.List;
 
 @Service
 public class BookServiceImpl implements BookService {
-    private BookDAO bookDAO;
+    private final BookDAO bookDAO;
+    private final ProductPhotoDAO productPhotoDAO;
 
     @Autowired
-    public BookServiceImpl(BookDAO bookDAO) {
+    public BookServiceImpl(BookDAO bookDAO, ProductPhotoDAO productPhotoDAO) {
         this.bookDAO = bookDAO;
+        this.productPhotoDAO = productPhotoDAO;
     }
 
     @Override
@@ -24,7 +27,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book getBookById(int id) {
-        return bookDAO.read(id);
+        Book book = bookDAO.read(id);
+        book.setProductPhoto(productPhotoDAO.read(id));
+        return book;
     }
 
     @Override

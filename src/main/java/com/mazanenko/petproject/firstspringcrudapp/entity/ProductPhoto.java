@@ -1,20 +1,14 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
 public class ProductPhoto {
-    private int id;
-    private String URL;
     private int productId;
+    private String URL;
 
     public ProductPhoto() {}
 
-    public ProductPhoto(int id, String URL, int productId) {
-        this.id = id;
+    public ProductPhoto(int productId, String URL) {
         this.URL = URL;
         this.productId = productId;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getURL() {
@@ -36,7 +30,6 @@ public class ProductPhoto {
     @Override
     public String toString() {
         return "ProductPhoto{" +
-                "id=" + getId() +
                 ", productId=" + getProductId() +
                 '}';
     }

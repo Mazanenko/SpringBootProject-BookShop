@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${book.getName()}">Title</title>
+</head>
+<body>
+
+
+
+    <img th:src="${book.getProductPhoto().getURL()}" alt="img"
+         width="150" height="200" th:align="left" th:hspace="10">
+
+
+    <p th:text="'Title ' + ${book.getName()}"></p>
+    <p th:text="'Author ' + ${book.getAuthor()}"></p>
+    <p th:text="'Genre ' + ${book.getGenre()}"></p>
+    <p th:text="'Description ' + ${book.getDescription()}"></p>
+    <p th:text="'Price ' + ${book.getPrice()}"></p>
+    <p th:text="'Quantity ' + ${book.getAvailableQuantity()}"></p>
+</body>
+</html>

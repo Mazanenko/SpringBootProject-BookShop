@@ -6,10 +6,28 @@
 </head>
 <body>
 
-<div th:each="book : ${books}">
-    <a th:text="${book.getId() + ', ' + book.getName() + ', ' + book.getAuthor() + ', ' + book.getPrice()}">book</a>
-</div>
-
+<table cellspacing="2" border="1" cellpadding="5" width="600">
+    <caption>List of books</caption>
+    <thead>
+    <tr>
+        <th> Title </th>
+        <th> Author </th>
+        <th> Genre </th>
+        <th> Price </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${books.isEmpty()}">
+        <td colspan="2"> No Books Available </td>
+    </tr>
+    <tr th:each="book : ${books}">
+        <td><span th:text="${book.getName()}"> Title </span></td>
+        <td><span th:text="${book.getAuthor()}"> Author </span></td>
+        <td><span th:text="${book.getGenre()}"> Genre </span></td>
+        <td><span th:text="${book.getPrice()}"> Price </span></td>
+    </tr>
+    </tbody>
+</table>
 
 </body>
 </html>

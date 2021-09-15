@@ -45,6 +45,14 @@ public abstract class Product {
         this.price = price;
     }
 
+    public ProductPhoto getProductPhoto() {
+        return productPhoto;
+    }
+
+    public void setProductPhoto(ProductPhoto productPhoto) {
+        this.productPhoto = productPhoto;
+    }
+
     public String getDescription() {
         return description;
     }
