@@ -3,6 +3,7 @@ package com.mazanenko.petproject.firstspringcrudapp.entity;
 public abstract class Product {
     private int id;
     private String name;
+    private int price;
     private String description;
     private int availableQuantity;
 
@@ -14,6 +15,7 @@ public abstract class Product {
                    ProductPhoto productPhoto) {
         this.id = id;
         this.name = name;
+
         this.description = description;
         this.availableQuantity = availableQuantity;
         this.productPhoto = productPhoto;
@@ -33,6 +35,14 @@ public abstract class Product {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 
     public String getDescription() {
@@ -56,45 +66,8 @@ public abstract class Product {
         return "Product{" +
                 "id=" + getId() +
                 ", name='" + getName() + '\'' +
+                ", price=" + getPrice() + '\'' +
                 ", availableQuantity='" + getAvailableQuantity() + '\'' +
                 '}';
-    }
-
-    class ProductPhoto {
-        private int id;
-        private String URL;
-        private int productId;
-
-        protected ProductPhoto() {}
-
-        public ProductPhoto(int id, String URL, int productId) {
-            this.id = id;
-            this.URL = URL;
-            this.productId = productId;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        public String getURL() {
-            return URL;
-        }
-
-        public void setURL(String URL) {
-            this.URL = URL;
-        }
-
-        public int getProductId() {
-            return productId;
-        }
-
-        public void setProductId(int productId) {
-            this.productId = productId;
-        }
     }
 }

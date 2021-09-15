@@ -21,8 +21,8 @@ public class BookDAO implements DAO<Book> {
 
     @Override
     public void create(Book book) {
-        jdbcTemplate.update("INSERT INTO book (name, author, genre, description, available_quantity) VALUES (?, ?, ?, ?, ?)",
-                book.getName(), book.getAuthor(), book.getGenre(), book.getDescription(), book.getAvailableQuantity());
+        jdbcTemplate.update("INSERT INTO book (name, author, genre, description, available_quantity, price) VALUES (?, ?, ?, ?, ?, ?)",
+                book.getName(), book.getAuthor(), book.getGenre(), book.getDescription(), book.getAvailableQuantity(), book.getPrice());
     }
 
     @Override
@@ -38,8 +38,8 @@ public class BookDAO implements DAO<Book> {
 
     @Override
     public void update(int id, Book book) {
-        jdbcTemplate.update("UPDATE book SET name = ?, author = ?, genre = ?, description = ?, available_quantity = ? WHERE id = ?",
-                book.getName(), book.getAuthor(), book.getGenre(), book.getDescription(), book.getAvailableQuantity(), id);
+        jdbcTemplate.update("UPDATE book SET name = ?, author = ?, genre = ?, description = ?, available_quantity = ?, price = ? WHERE id = ?",
+                book.getName(), book.getAuthor(), book.getGenre(), book.getDescription(), book.getAvailableQuantity(), book.getPrice(), id);
     }
 
     @Override
