@@ -1,7 +1,13 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
+import javax.validation.constraints.NotBlank;
+
 public class Book extends Product {
+
+    @NotBlank(message = "Should be not empty")
     private String author;
+
+    @NotBlank(message = "Should be not empty")
     private String genre;
 
     public Book() {}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New book</title>
+    <link th:include="/import/style.html">
+</head>
+<body>
+
+<link th:include="/import/header.html">
+
+<p>Step 1: enter book info</p>
+
+<form th:method="POST" th:action="@{/books}" th:object="${book}">
+    <label for="name">Enter name: </label>
+    <input type="text" th:field="*{name}" id="name"/>
+    <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name error</div>
+    <br/>
+    <label for="author">Enter author: </label>
+    <input type="text" th:field="*{author}" id="author"/>
+    <div style="color: red" th:if="${#fields.hasErrors('author')}" th:errors="*{author}">Author error</div>
+    <br/>
+    <label for="genre">Enter genre: </label>
+    <input type="text" th:field="*{genre}" id="genre"/>
+    <div style="color: red" th:if="${#fields.hasErrors('genre')}" th:errors="*{genre}">Genre error</div>
+    <br/>
+    <label for="description">Enter description: </label>
+    <input type="text" th:field="*{description}" id="description"/>
+    <div style="color: red" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Genre error</div>
+    <br/>
+    <label for="availableQuantity">Enter available quantity: </label>
+    <input type="number" th:field="*{availableQuantity}" id="availableQuantity"/>
+    <div style="color: red" th:if="${#fields.hasErrors('availableQuantity')}" th:errors="*{availableQuantity}">Genre error</div>
+    <br/>
+    <label for="price">Enter price: </label>
+    <input type="number" th:field="*{price}" id="price"/>
+    <div style="color: red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Genre error</div>
+    <br/>
+    <input type="submit" value="Next">
+</form>
+
+</body>
+</html>

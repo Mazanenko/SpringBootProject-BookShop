@@ -3,20 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${book.getName()}">Title</title>
+    <link th:include="/import/style.html">
+    <style>
+        .btn {
+            border: none;
+            color: white;
+            padding: 14px 28px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .warning {background-color: #ff9800;} /* Orange */
+        .warning:hover {background: #e68a00;}
+
+        .danger {background-color: #f44336;} /* Red */
+        .danger:hover {background: #da190b;}
+    </style>
 </head>
 <body>
 
+<link th:include="/import/header.html">
+
+<br/>
+
+<img th:src="${book.getProductPhoto()} ? ${book.getProductPhoto().getURL()} : ${null}" alt="img not found"
+     width="250" height="350" th:align="left" th:hspace="10">
+
+<p th:text="'Title: ' + ${book.getName()}"></p>
+<p th:text="'Author: ' + ${book.getAuthor()}"></p>
+<p th:text="'Genre: ' + ${book.getGenre()}"></p>
+<p th:text="'Description: ' + ${book.getDescription()}"></p>
+<p th:text="'Price: ' + ${book.getPrice()}"></p>
+<p th:text="'Quantity: ' + ${book.getAvailableQuantity()}"></p>
 
 
-    <img th:src="${book.getProductPhoto().getURL()}" alt="img"
-         width="150" height="200" th:align="left" th:hspace="10">
+
+<a th:href="@{/books/{id}/edit-book(id=${book.getId()})}">
+    <button class="btn warning">Edit</button>
+</a>
 
 
-    <p th:text="'Title ' + ${book.getName()}"></p>
-    <p th:text="'Author ' + ${book.getAuthor()}"></p>
-    <p th:text="'Genre ' + ${book.getGenre()}"></p>
-    <p th:text="'Description ' + ${book.getDescription()}"></p>
-    <p th:text="'Price ' + ${book.getPrice()}"></p>
-    <p th:text="'Quantity ' + ${book.getAvailableQuantity()}"></p>
+<form th:method="DELETE" th:action="@{/books/{id}(id=${book.getId()})}">
+    <button class="btn danger" >Delete</button>
+</form>
+
 </body>
 </html>

@@ -2,12 +2,21 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>List of books</title>
+    <title>Books</title>
+    <link th:include="/import/style.html">
 </head>
 <body>
 
+<div class="topnav">
+    <a href="/">Home</a>
+    <a class="active" th:href="@{/books}">Books</a>
+    <a href="#cart">Cart</a>
+    <a href="#about">About</a>
+</div>
+
+<br/>
+
 <table cellspacing="2" border="1" cellpadding="5" width="600">
-    <caption>List of books</caption>
     <thead>
     <tr>
         <th> Title </th>
@@ -21,13 +30,22 @@
         <td colspan="2"> No Books Available </td>
     </tr>
     <tr th:each="book : ${books}">
-        <td><span th:text="${book.getName()}"> Title </span></td>
+        <td><a th:href="@{/books/{id}(id=${book.getId()})}">
+            <span  th:text="${book.getName()}"> Title </span>
+        </a></td>
         <td><span th:text="${book.getAuthor()}"> Author </span></td>
         <td><span th:text="${book.getGenre()}"> Genre </span></td>
         <td><span th:text="${book.getPrice()}"> Price </span></td>
+
+
     </tr>
     </tbody>
 </table>
 
+
+
 </body>
 </html>
+
+
+

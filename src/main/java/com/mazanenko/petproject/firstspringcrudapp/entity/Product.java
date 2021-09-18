@@ -1,10 +1,23 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
+
 public abstract class Product {
+
     private int id;
+
+    @NotBlank(message = "Should be not empty")
     private String name;
+
+    @Min(value = 0, message = "Should be greater then zero")
     private int price;
+
+    @NotBlank(message = "Should be not empty")
     private String description;
+
+    @PositiveOrZero(message = "Should be positive or zero")
     private int availableQuantity;
 
     private ProductPhoto productPhoto;
