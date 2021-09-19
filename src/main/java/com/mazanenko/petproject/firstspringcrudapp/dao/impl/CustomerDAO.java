@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class CustomerDAOImpl implements DAO<Customer> {
+public class CustomerDAO implements DAO<Customer> {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public CustomerDAOImpl(JdbcTemplate jdbcTemplate) {
+    public CustomerDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
