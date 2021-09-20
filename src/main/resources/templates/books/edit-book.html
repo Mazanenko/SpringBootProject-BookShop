@@ -27,6 +27,10 @@
         <input type="text" th:field="*{genre}" id="genre"/>
         <div style="color: red" th:if="${#fields.hasErrors('genre')}" th:errors="*{genre}">Genre error</div>
         <br/>
+        <label for="photoURL">Photo URL: </label>
+        <input type="text" th:field="*{photoURL}" id="photoURL"/>
+        <div style="color: red" th:if="${#fields.hasErrors('photoURL')}" th:errors="*{photoURL}">Photo URL error</div>
+        <br/>
         <label for="description">Enter description: </label>
         <textarea type="text" th:field="*{description}" id="description" style="height:200px"></textarea>
         <div style="color: red" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Genre error</div>

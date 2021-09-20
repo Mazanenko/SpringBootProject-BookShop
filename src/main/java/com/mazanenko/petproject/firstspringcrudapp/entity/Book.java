@@ -10,13 +10,16 @@ public class Book extends Product {
     @NotBlank(message = "Should be not empty")
     private String genre;
 
+    private String photoURL;
+
     public Book() {}
 
-    public Book(int id, String name, String description, int availableQuantity, ProductPhoto productPhoto,
-                String author, String genre) {
-        super(id, name, description, availableQuantity, productPhoto);
+    public Book(int id, String name, String description, int availableQuantity, String author, String genre,
+                String photoURL) {
+        super(id, name, description, availableQuantity);
         this.author = author;
         this.genre = genre;
+        this.photoURL = photoURL;
     }
 
     public String getAuthor() {
@@ -33,6 +36,14 @@ public class Book extends Product {
 
     public void setGenre(String genre) {
         this.genre = genre;
+    }
+
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
     }
 
     @Override

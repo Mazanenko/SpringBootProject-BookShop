@@ -11,7 +11,7 @@
 
 <br/>
 
-<img th:src="${book.getProductPhoto()} ? ${book.getProductPhoto().getURL()} : ${null}" alt="img not found"
+<img th:src="${book.getPhotoURL()}" alt="img not found"
      width="250" height="350" th:align="left" th:hspace="10">
 
 <p th:text="'Title: ' + ${book.getName()}"></p>

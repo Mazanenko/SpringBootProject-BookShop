@@ -20,18 +20,16 @@ public abstract class Product {
     @PositiveOrZero(message = "Should be positive or zero")
     private int availableQuantity;
 
-    private ProductPhoto productPhoto;
 
-    public Product() {}
+    public Product() {
+    }
 
-    public Product(int id, String name, String description, int availableQuantity,
-                   ProductPhoto productPhoto) {
+    public Product(int id, String name, String description, int availableQuantity) {
         this.id = id;
         this.name = name;
 
         this.description = description;
         this.availableQuantity = availableQuantity;
-        this.productPhoto = productPhoto;
     }
 
     public int getId() {
@@ -56,14 +54,6 @@ public abstract class Product {
 
     public void setPrice(int price) {
         this.price = price;
-    }
-
-    public ProductPhoto getProductPhoto() {
-        return productPhoto;
-    }
-
-    public void setProductPhoto(ProductPhoto productPhoto) {
-        this.productPhoto = productPhoto;
     }
 
     public String getDescription() {
