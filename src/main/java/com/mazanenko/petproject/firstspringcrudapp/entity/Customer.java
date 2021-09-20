@@ -1,10 +1,21 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
-import java.util.EnumSet;
+
+import javax.validation.constraints.*;
 
 public class Customer extends Person {
+    @NotBlank(message = "Should be not empty")
     private String surname;
+
+    @NotBlank(message = "Should be not empty")
+    @Size(min = 4, max = 6, message = "Should be 'male' or 'female'")
+    private String gender;
+
+    @NotBlank(message = "Should be not empty")
     private String phone;
+
+    @NotEmpty(message = "Should be not empty")
+    @Email(message = "Not email")
     private String email;
 
     private DeliveryAddress deliveryAddress;
@@ -12,10 +23,11 @@ public class Customer extends Person {
 
     public Customer() {}
 
-    public Customer(int id, String name, String surname, String phone, String email,
+    public Customer(int id, String name, String surname, String gender, String phone, String email,
                     DeliveryAddress deliveryAddress, Cart cart) {
         super(id, name);
         this.surname = surname;
+        this.gender = gender;
         this.phone = phone;
         this.email = email;
         this.deliveryAddress = deliveryAddress;
@@ -28,6 +40,14 @@ public class Customer extends Person {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getPhone() {
@@ -67,7 +87,8 @@ public class Customer extends Person {
         return "Customer{" +
                 "id=" + getId() +
                 ", name='" + getName() + '\'' +
-                "surname='" + getSurname() +
+                ", surname='" + getSurname() + '\'' +
+                "gender='" + getGender() +
                 '}';
     }
 }

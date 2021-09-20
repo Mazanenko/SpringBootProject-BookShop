@@ -22,8 +22,8 @@ public class CustomerDAO implements DAO<Customer> {
 
     @Override
     public void create(Customer customer) {
-        jdbcTemplate.update("INSERT INTO customer (name, surname, phone, email) VALUES (?, ?, ?, ?)",
-        customer.getName(), customer.getSurname(), customer.getPhone(), customer.getEmail());
+        jdbcTemplate.update("INSERT INTO customer (name, surname, gender, phone, email) VALUES (?, ?, ?, ?, ?)",
+        customer.getName(), customer.getSurname(), customer.getGender(), customer.getPhone(), customer.getEmail());
     }
 
     @Override
@@ -39,8 +39,9 @@ public class CustomerDAO implements DAO<Customer> {
 
     @Override
     public void update(int id, Customer customer) {
-        jdbcTemplate.update("UPDATE customer SET name = ?, surname = ?, phone = ?, email = ? WHERE id = ?",
-                customer.getName(), customer.getSurname(), customer.getPhone(), customer.getEmail());
+        jdbcTemplate.update("UPDATE customer SET name = ?, surname = ?, gender = ?, phone = ?, email = ? WHERE id = ?",
+                customer.getName(), customer.getSurname(), customer.getGender(), customer.getPhone(), customer.getEmail(),
+        customer.getId());
     }
 
     @Override

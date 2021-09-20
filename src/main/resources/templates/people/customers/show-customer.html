@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${customer.getName()}">Title</title>
+    <link th:include="/import/style.html">
+</head>
+<body>
+
+<link th:include="/import/header.html">
+
+<br/>
+<h3>Customer info:</h3>
+
+<p th:text="'Name: ' + ${customer.getName()}"></p>
+<p th:text="'Surname: ' + ${customer.getSurname()}"></p>
+<p th:text="'Gender: ' + ${customer.getGender()}"></p>
+<p th:text="'Phone number: ' + ${customer.getPhone()}"></p>
+<p th:text="'Email: ' + ${customer.getEmail()}"></p>
+
+
+<a th:href="@{{id}/edit(id=${customer.getId()})}">
+    <button class="btn warning">Edit</button>
+</a>
+
+<form th:method="DELETE" th:action="@{{id}(id=${customer.getId()})}">
+    <button class="btn danger" >Delete</button>
+</form>
+<br/>
+
+</body>
+</html>

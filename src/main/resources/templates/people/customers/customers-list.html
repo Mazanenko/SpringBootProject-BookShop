@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Customers</title>
+    <link th:include="/import/style.html">
+    <link th:include="/import/tableStyle.html">
+</head>
+<body>
+
+<div class="topnav">
+    <a href="/">Home</a>
+    <a th:href="@{/books}">Books</a>
+    <a class="active" th:href="@{/people/customers}">Customers</a>
+    <a href="#cart">Cart</a>
+    <a href="#about">About</a>
+</div>
+
+<br/>
+
+<a th:href="@{/people/customers/new}">
+    <button class="btn success">Add new customer</button>
+</a>
+
+<br/>
+<br/>
+
+<div style="overflow-x:auto;">
+    <table>
+        <thead>
+        <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Gender</th>
+            <th>Email</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:if="${customers.isEmpty()}">
+            <td colspan="2"> No customers yet </td>
+        </tr>
+        <tr th:each="customer : ${customers}">
+            <td><span th:text="${customer.getId()}"> Id </span></td>
+            <td><a th:href="@{/people/customers/{id}(id=${customer.getId()})}">
+                <span  th:text="${customer.getName()}"> Name </span>
+            </a></td>
+            <td><span th:text="${customer.getSurname()}"> Surname </span></td>
+            <td><span th:text="${customer.getGender()}"> Gender </span></td>
+            <td><span th:text="${customer.getEmail()}"> Email </span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
+
+
+

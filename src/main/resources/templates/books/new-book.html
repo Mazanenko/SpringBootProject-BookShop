@@ -10,7 +10,7 @@
 
 <link th:include="/import/header.html">
 
-<h3>Step 1: enter book info</h3>
+<h3>Enter book info</h3>
 
 <div class="container">
 
@@ -46,7 +46,7 @@
         <div style="color: red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Genre error</div>
         <br/>
         <br/>
-        <input type="submit" value="Next">
+        <input type="submit" value="Submit">
     </form>
 </div>
 

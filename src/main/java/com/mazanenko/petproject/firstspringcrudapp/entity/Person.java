@@ -1,7 +1,11 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
+import javax.validation.constraints.NotBlank;
+
 public abstract class Person {
     private int id;
+
+    @NotBlank(message = "Should be not empty")
     private String name;
 
     public Person() {}
