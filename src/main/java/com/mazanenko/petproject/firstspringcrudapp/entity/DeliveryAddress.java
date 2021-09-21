@@ -1,12 +1,24 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+
 public class DeliveryAddress {
     private int customerId;
+
+    @NotBlank(message = "Should be not empty")
     private String country;
+
+    @NotBlank(message = "Should be not empty")
     private String city;
+
+    @NotBlank(message = "Should be not empty")
     private String street;
+
+    @Positive(message = "Should be positive")
     private int houseNumber;
+
     private String note;
 
     public DeliveryAddress() {}

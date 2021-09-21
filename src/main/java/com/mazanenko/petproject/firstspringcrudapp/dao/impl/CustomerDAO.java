@@ -32,6 +32,11 @@ public class CustomerDAO implements DAO<Customer> {
                 .stream().findAny().orElse(null);
     }
 
+    public Customer readByEmail(String email) {
+        return jdbcTemplate.query ("SELECT * FROM customer WHERE email = ?", new CustomerMapper(), email)
+                .stream().findAny().orElse(null);
+    }
+
     @Override
     public List<Customer> readAll() {
         return jdbcTemplate.query("SELECT * FROM customer", new CustomerMapper());

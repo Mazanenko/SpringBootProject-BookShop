@@ -40,7 +40,7 @@ public class DeliveryAddressDAO implements DAO<DeliveryAddress> {
     public void update(int id, DeliveryAddress deliveryAddress) {
         jdbcTemplate.update("UPDATE delivery_address SET country = ?, city = ?, street = ?, " +
                 "house_number = ?, note = ? WHERE customer_id = ?", deliveryAddress.getCountry(), deliveryAddress.getCity(),
-                deliveryAddress.getStreet(), deliveryAddress.getHouseNumber(), deliveryAddress.getNote());
+                deliveryAddress.getStreet(), deliveryAddress.getHouseNumber(), deliveryAddress.getNote(), id);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.mazanenko.petproject.firstspringcrudapp.service.impl;
 import com.mazanenko.petproject.firstspringcrudapp.dao.impl.CustomerDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.impl.DeliveryAddressDAO;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
+import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,15 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void createCustomer(Customer customer) {
+    public void createCustomer(Customer customer, DeliveryAddress address) {
+        Customer tempCustomer;
         customerDAO.create(customer);
+
+        tempCustomer = customerDAO.readByEmail(customer.getEmail());
+        address.setCustomerId(tempCustomer.getId());
+
+        addressDAO.create(address);
+
     }
 
     @Override
@@ -33,14 +41,16 @@ public class CustomerServiceImpl implements CustomerService {
         return customer;
     }
 
+    // no need?
     @Override
     public List<Customer> getAllCustomers() {
         return customerDAO.readAll();
     }
 
     @Override
-    public void updateCustomerById(int id, Customer updatedCustomer) {
+    public void updateCustomerById(int id, Customer updatedCustomer, DeliveryAddress updatedAddress) {
         customerDAO.update(id, updatedCustomer);
+        addressDAO.update(id, updatedAddress);
     }
 
     @Override

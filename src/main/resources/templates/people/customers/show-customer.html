@@ -18,14 +18,35 @@
 <p th:text="'Phone number: ' + ${customer.getPhone()}"></p>
 <p th:text="'Email: ' + ${customer.getEmail()}"></p>
 
+<h4>Delivery address:</h4>
+
+<div>
+    <div th:if="${customer.getDeliveryAddress() == null}">
+        <p>No address yet</p>
+    </div>
+
+    <div th:unless="${customer.getDeliveryAddress() == null}">
+        <p th:text="'Country: ' + ${customer.getDeliveryAddress().getCountry()}"></p>
+        <p th:text="'City: ' + ${customer.getDeliveryAddress().getCity()}"></p>
+        <p th:text="'Street: ' + ${customer.getDeliveryAddress().getStreet()}"></p>
+        <p th:text="'House number: ' + ${customer.getDeliveryAddress().getHouseNumber()}"></p>
+        <p th:text="'Note: ' + ${customer.getDeliveryAddress().getNote()}"></p>
+    </div>
+</div>
+
+<br/>
 
 <a th:href="@{{id}/edit(id=${customer.getId()})}">
-    <button class="btn warning">Edit</button>
+    <button class="btn warning">Edit customer</button>
 </a>
 
+<br/>
+<br/>
+
 <form th:method="DELETE" th:action="@{{id}(id=${customer.getId()})}">
-    <button class="btn danger" >Delete</button>
+    <button class="btn danger" >Delete customer</button>
 </form>
+
 <br/>
 
 </body>
