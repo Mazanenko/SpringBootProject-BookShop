@@ -41,7 +41,6 @@ public class CustomerServiceImpl implements CustomerService {
         return customer;
     }
 
-    // no need?
     @Override
     public List<Customer> getAllCustomers() {
         return customerDAO.readAll();

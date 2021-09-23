@@ -4,10 +4,12 @@ import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -44,12 +46,24 @@ public class CustomerController {
 
     @PostMapping
     public String createCustomer(@ModelAttribute("customer") @Valid Customer customer,
+                                 BindingResult customerResult,
                                  @ModelAttribute("address") @Valid DeliveryAddress address,
-                                 BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+                                 BindingResult addressResult) {
+        if (customerResult.hasErrors() || addressResult.hasErrors()) {
+            System.out.println(customerResult.getAllErrors());
             return "/people/customers/new-customer";
         } else {
-            customerService.createCustomer(customer, address);
+            try {
+                customerService.createCustomer(customer, address);
+            } catch (DataAccessException e) {
+
+                if (e.getCause().getMessage().contains("unique_email")) {
+
+                    customerResult.addError(new FieldError("customer", "email"
+                            , customer.getEmail() + " already registered! Please, input new one."));
+                }
+                return "/people/customers/new-customer";
+            }
             return "redirect:/people/customers";
         }
     }
@@ -64,13 +78,24 @@ public class CustomerController {
 
     @PatchMapping("/{id}")
     public String updateCustomer(@ModelAttribute("customer") @Valid Customer customer,
+                                 BindingResult customerResult,
                                  @ModelAttribute("address") @Valid DeliveryAddress address,
-                                 BindingResult bindingResult, @PathVariable("id") int id) {
+                                 BindingResult addressResult, @PathVariable("id") int id) {
 
-        if (bindingResult.hasErrors()) {
+        if (customerResult.hasErrors() || addressResult.hasErrors()) {
             return "/people/customers/edit-customer";
         } else {
-            customerService.updateCustomerById(id, customer, address);
+            try {
+                customerService.updateCustomerById(id, customer, address);
+            } catch (DataAccessException e) {
+
+                if (e.getCause().getMessage().contains("unique_email")) {
+
+                    customerResult.addError(new FieldError("customer", "email"
+                            , customer.getEmail() + " already registered! Please, input new one."));
+                }
+                return "/people/customers/new-customer";
+            }
             return "redirect:/people/customers";
         }
     }

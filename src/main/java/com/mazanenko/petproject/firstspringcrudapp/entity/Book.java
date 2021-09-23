@@ -1,6 +1,7 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 public class Book extends Product {
 
@@ -10,6 +11,8 @@ public class Book extends Product {
     @NotBlank(message = "Should be not empty")
     private String genre;
 
+    @Pattern(regexp = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,4}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)",
+    message = "not valid URL")
     private String photoURL;
 
     public Book() {}
