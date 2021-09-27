@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${customer.getName()}">Title</title>
+    <title>Customer profile</title>
     <link th:include="/import/style.html">
 </head>
 <body>
@@ -10,44 +10,50 @@
 <link th:include="/import/header.html">
 
 <br/>
-<h3>Customer info:</h3>
 
-<p th:text="'Name: ' + ${customer.getName()}"></p>
-<p th:text="'Surname: ' + ${customer.getSurname()}"></p>
-<p th:text="'Gender: ' + ${customer.getGender()}"></p>
-<p th:text="'Phone number: ' + ${customer.getPhone()}"></p>
-<p th:text="'Email: ' + ${customer.getEmail()}"></p>
+<div th:if="${customer == null}">Customer does not exist.</div>
 
-<h4>Delivery address:</h4>
+<div th:unless="${customer == null}">
+    <h3>Customer info:</h3>
 
-<div>
-    <div th:if="${customer.getDeliveryAddress() == null}">
-        <p>No address yet</p>
+    <p th:text="'Name: ' + ${customer.getName()}"></p>
+    <p th:text="'Surname: ' + ${customer.getSurname()}"></p>
+    <p th:text="'Gender: ' + ${customer.getGender()}"></p>
+    <p th:text="'Phone number: ' + ${customer.getPhone()}"></p>
+    <p th:text="'Email: ' + ${customer.getEmail()}"></p>
+
+    <h4>Delivery address:</h4>
+
+    <div>
+        <div th:if="${customer.getDeliveryAddress() == null}">
+            <p>No address yet</p>
+        </div>
+
+        <div th:unless="${customer.getDeliveryAddress() == null}">
+            <p th:text="'Country: ' + ${customer.getDeliveryAddress().getCountry()}"></p>
+            <p th:text="'City: ' + ${customer.getDeliveryAddress().getCity()}"></p>
+            <p th:text="'Street: ' + ${customer.getDeliveryAddress().getStreet()}"></p>
+            <p th:text="'House number: ' + ${customer.getDeliveryAddress().getHouseNumber()}"></p>
+            <p th:text="'Note: ' + ${customer.getDeliveryAddress().getNote()}"></p>
+        </div>
     </div>
 
-    <div th:unless="${customer.getDeliveryAddress() == null}">
-        <p th:text="'Country: ' + ${customer.getDeliveryAddress().getCountry()}"></p>
-        <p th:text="'City: ' + ${customer.getDeliveryAddress().getCity()}"></p>
-        <p th:text="'Street: ' + ${customer.getDeliveryAddress().getStreet()}"></p>
-        <p th:text="'House number: ' + ${customer.getDeliveryAddress().getHouseNumber()}"></p>
-        <p th:text="'Note: ' + ${customer.getDeliveryAddress().getNote()}"></p>
-    </div>
+    <br/>
+
+    <a th:href="@{{id}/edit(id=${customer.getId()})}">
+        <button class="btn warning">Edit customer</button>
+    </a>
+
+    <br/>
+    <br/>
+
+    <form th:method="DELETE" th:action="@{{id}(id=${customer.getId()})}">
+        <button class="btn danger" >Delete customer</button>
+    </form>
+
+    <br/>
 </div>
 
-<br/>
-
-<a th:href="@{{id}/edit(id=${customer.getId()})}">
-    <button class="btn warning">Edit customer</button>
-</a>
-
-<br/>
-<br/>
-
-<form th:method="DELETE" th:action="@{{id}(id=${customer.getId()})}">
-    <button class="btn danger" >Delete customer</button>
-</form>
-
-<br/>
 
 </body>
 </html>

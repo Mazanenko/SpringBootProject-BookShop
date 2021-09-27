@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart</title>
+    <link th:include="/import/style.html">
+</head>
+<body>
+
+<link th:include="/import/header.html">
+
+<br/>
+
+<div th:if="${cart == null}">Customer does not exist.</div>
+
+
+<div th:unless="${cart == null}" style="overflow-x:auto;">
+    <div th:if="${cart.getOrderList().isEmpty()}">No orders yet.</div>
+
+    <div th:unless="${cart.getOrderList().isEmpty()}">
+        <table>
+            <thead>
+            <tr>
+                <th>cart id</th>
+                <th>product id</th>
+                <th>Quantity</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:unless="${cart.getOrderList().isEmpty()}" th:each="order : ${cart.getOrderList()}">
+                <td><span th:text="${order.getCartId()}"> cart id </span></td>
+                <td><a th:href="@{/books/{id}(id=${order.getProductId()})}">
+                    <span th:text="${order.getProductId()}"> product id </span>
+                </a></td>
+                <td><span th:text="${order.getQuantity()}"> quantity </span></td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

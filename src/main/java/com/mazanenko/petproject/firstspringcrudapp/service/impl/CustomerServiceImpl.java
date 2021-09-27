@@ -1,7 +1,9 @@
 package com.mazanenko.petproject.firstspringcrudapp.service.impl;
 
+import com.mazanenko.petproject.firstspringcrudapp.dao.impl.CartDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.impl.CustomerDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.impl.DeliveryAddressDAO;
+import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
@@ -15,11 +17,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerDAO customerDAO;
     private final DeliveryAddressDAO addressDAO;
+    private final CartDAO cartDAO;
 
     @Autowired
-    public CustomerServiceImpl(CustomerDAO customerDAO, DeliveryAddressDAO addressDAO) {
+    public CustomerServiceImpl(CustomerDAO customerDAO, DeliveryAddressDAO addressDAO, CartDAO cartDAO) {
         this.customerDAO = customerDAO;
         this.addressDAO = addressDAO;
+        this.cartDAO = cartDAO;
     }
 
     @Override
@@ -32,12 +36,18 @@ public class CustomerServiceImpl implements CustomerService {
 
         addressDAO.create(address);
 
+        Cart cart = new Cart();
+        cart.setCustomerId(tempCustomer.getId());
+        customer.setCart(cart);
+        cartDAO.create(cart);
     }
 
     @Override
     public Customer getCustomerById(int id) {
         Customer customer = customerDAO.read(id);
-        customer.setDeliveryAddress(addressDAO.read(id));
+        if (customer != null) {
+            customer.setDeliveryAddress(addressDAO.read(id));
+        }
         return customer;
     }
 

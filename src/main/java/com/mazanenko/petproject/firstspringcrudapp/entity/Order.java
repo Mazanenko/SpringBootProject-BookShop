@@ -2,20 +2,29 @@ package com.mazanenko.petproject.firstspringcrudapp.entity;
 
 
 public class Order {
+    private int id;
     private int cartId;
     private int productId;
     private int quantity;
 
-    private Product product;
+    // no need?
+//    private Product product;
 
     public Order() {
     }
 
-    public Order(int cartId, int productId, int quantity, Product product) {
+    public Order(int cartId, int productId, int quantity) {
         this.cartId = cartId;
         this.productId = productId;
         this.quantity = quantity;
-        this.product = product;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getCartId() {
@@ -40,14 +49,6 @@ public class Order {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
     }
 
     @Override
