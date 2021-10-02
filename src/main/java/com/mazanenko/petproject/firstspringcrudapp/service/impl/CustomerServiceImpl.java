@@ -8,6 +8,8 @@ import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +31,9 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void createCustomer(Customer customer, DeliveryAddress address) {
         Customer tempCustomer;
+
+        String cryptedPassword = BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt());
+        customer.setPassword(cryptedPassword);
         customerDAO.create(customer);
 
         tempCustomer = customerDAO.readByEmail(customer.getEmail());
@@ -52,12 +57,20 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Customer getCustomerByEmail(String email) {
+        return customerDAO.readByEmail(email);
+    }
+
+    @Override
     public List<Customer> getAllCustomers() {
         return customerDAO.readAll();
     }
 
     @Override
     public void updateCustomerById(int id, Customer updatedCustomer, DeliveryAddress updatedAddress) {
+        String cryptedPassword = BCrypt.hashpw(updatedCustomer.getPassword(), BCrypt.gensalt());
+        updatedCustomer.setPassword(cryptedPassword);
+
         customerDAO.update(id, updatedCustomer);
         addressDAO.update(id, updatedAddress);
     }

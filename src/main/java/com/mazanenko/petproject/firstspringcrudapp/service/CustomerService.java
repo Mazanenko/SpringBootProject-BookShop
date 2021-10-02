@@ -10,6 +10,8 @@ public interface CustomerService {
 
     Customer getCustomerById(int id);
 
+    Customer getCustomerByEmail(String email);
+
     List<Customer> getAllCustomers();
 
     void updateCustomerById(int id, Customer updatedCustomer, DeliveryAddress address);

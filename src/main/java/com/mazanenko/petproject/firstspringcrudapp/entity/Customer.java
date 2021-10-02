@@ -5,23 +5,32 @@ import javax.validation.constraints.*;
 
 public class Customer extends Person {
 
-    @NotBlank(message = "Should be not empty")
-    @Size(min = 4, max = 6, message = "Should be 'male' or 'female'")
+    @NotBlank(message = "Must be not empty")
+    @Size(min = 4, max = 6, message = "Must be 'male' or 'female'")
     private String gender;
 
-    @NotBlank(message = "Should be not empty")
+    @NotBlank(message = "Must be not empty")
     private String phone;
+
+    @NotBlank(message = "Must be not empty")
+    @Size(min = 6, message = "Must be at least 6 characters")
+    private String password;
+
+    private final static String role = "customer";
+
 
     private DeliveryAddress deliveryAddress;
     private Cart cart;
 
-    public Customer() {}
+    public Customer() {
+    }
 
-    public Customer(int id, String name, String surname, String gender, String phone, String email,
-                    DeliveryAddress deliveryAddress, Cart cart) {
+    public Customer(int id, String name, String surname, String gender, String phone, String email, String password
+            , DeliveryAddress deliveryAddress, Cart cart) {
         super(id, name, email, surname);
         this.gender = gender;
         this.phone = phone;
+        this.password = password;
         this.deliveryAddress = deliveryAddress;
         this.cart = cart;
     }
@@ -56,6 +65,14 @@ public class Customer extends Person {
 
     public void setCart(Cart cart) {
         this.cart = cart;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override

@@ -6,12 +6,13 @@ import javax.validation.constraints.NotEmpty;
 
 public abstract class Person {
 
+    private int id;
+
     @NotBlank(message = "Should be not empty")
     private String name;
 
     @NotBlank(message = "Should be not empty")
     protected String surname;
-    private int id;
 
     @NotEmpty(message = "Should be not empty")
     @Email(message = "Not email")
