@@ -3,6 +3,7 @@ package com.mazanenko.petproject.firstspringcrudapp.entity;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 public abstract class Person {
 
@@ -12,19 +13,27 @@ public abstract class Person {
     private String name;
 
     @NotBlank(message = "Should be not empty")
-    protected String surname;
+    private String surname;
 
     @NotEmpty(message = "Should be not empty")
     @Email(message = "Not email")
-    protected String email;
+    private String email;
+
+    @NotBlank(message = "Must be not empty")
+    @Size(min = 6, message = "Must be at least 6 characters")
+    private String password;
+
+    private String role;
 
     public Person() {}
 
-    public Person(int id, String name, String email, String surname) {
+    public Person(int id, String name, String surname, String email, String password, String role) {
         this.id = id;
         this.name = name;
-        this.email = email;
         this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
     public int getId() {
@@ -51,12 +60,28 @@ public abstract class Person {
         this.email = email;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getSurname() {
         return surname;
     }
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Customers</title>
@@ -8,19 +9,15 @@
 </head>
 <body>
 
-<div class="topnav">
-    <a href="/">Home</a>
-    <a th:href="@{/books}">Books</a>
-    <a class="active" th:href="@{/people/customers}">Customers</a>
-    <a href="#cart">Cart</a>
-    <a href="#about">About</a>
-</div>
-
+<link th:include="/import/header.html">
 <br/>
 
-<a th:href="@{/people/customers/new}">
-    <button class="btn success">Add new customer</button>
-</a>
+<div sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+    <a th:href="@{/people/customers/new}">
+        <button class="btn success">Add new customer</button>
+    </a>
+</div>
+
 
 <br/>
 <br/>

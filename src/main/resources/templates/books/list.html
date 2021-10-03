@@ -1,24 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Books</title>
     <link th:include="/import/style.html">
 </head>
 <body>
-
-<div class="topnav">
-    <a href="/">Home</a>
-    <a class="active" th:href="@{/books}">Books</a>
-    <a href="#cart">Cart</a>
-    <a href="#about">About</a>
-</div>
+<link th:include="/import/header.html">
 
 <br/>
 
-<a th:href="@{/books/new-book}">
-    <button class="btn success">Add new book</button>
-</a>
+<div sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')">
+    <a th:href="@{/books/new-book}">
+        <button class="btn success">Add new book</button>
+    </a>
+</div>
 
 <br/>
 <br/>
