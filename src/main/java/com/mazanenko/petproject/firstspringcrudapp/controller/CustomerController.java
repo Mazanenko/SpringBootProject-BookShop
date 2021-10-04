@@ -30,7 +30,7 @@ public class CustomerController {
         return "/people/customers/customers-list";
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public String showCustomer(@PathVariable("id") int id, Model model) {
         model.addAttribute("customer", customerService.getCustomerById(id));
         return "/people/customers/show-customer";
@@ -50,7 +50,6 @@ public class CustomerController {
                                  @ModelAttribute("address") @Valid DeliveryAddress address,
                                  BindingResult addressResult) {
         if (customerResult.hasErrors() || addressResult.hasErrors()) {
-            System.out.println(customerResult.getAllErrors());
             return "/people/customers/new-customer";
         } else {
             try {

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manager profile</title>
+    <link th:include="/import/style.html">
+</head>
+<body>
+
+<link th:include="/import/header.html">
+
+<br/>
+
+<div th:if="${manager == null}">Manager does not exist.</div>
+
+<div th:unless="${manager == null}">
+    <h3>Manager info:</h3>
+
+    <p th:text="'Name: ' + ${manager.getName()}"></p>
+    <p th:text="'Surname: ' + ${manager.getSurname()}"></p>
+    <p th:text="'Email: ' + ${manager.getEmail()}"></p>
+
+    <br/>
+
+    <a th:href="@{{id}/edit(id=${manager.getId()})}">
+        <button class="btn warning">Edit manager</button>
+    </a>
+
+    <br/>
+    <br/>
+
+    <form th:method="DELETE" th:action="@{{id}(id=${manager.getId()})}">
+        <button class="btn danger" >Delete manager</button>
+    </form>
+
+    <br/>
+</div>
+
+
+</body>
+</html>

@@ -35,12 +35,14 @@
             <td colspan="2"> No managers yet </td>
         </tr>
         <tr th:each="manager : ${managers}">
-            <td><span th:text="${manager.getId()}"> Id </span></td>
-            <td><a th:href="@{/people/managers/{id}(id=${manager.getId()})}">
-                <span  th:text="${manager.getName()}"> Name </span>
-            </a></td>
-            <td><span th:text="${manager.getSurname()}"> Surname </span></td>
-            <td><span th:text="${manager.getEmail()}"> Email </span></td>
+            <div th:unless="${manager.getEmail()} == 'admin'">
+                <td><span th:text="${manager.getId()}"> Id </span></td>
+                <td><a th:href="@{/people/managers/{id}(id=${manager.getId()})}">
+                    <span  th:text="${manager.getName()}"> Name </span>
+                </a></td>
+                <td><span th:text="${manager.getSurname()}"> Surname </span></td>
+                <td><span th:text="${manager.getEmail()}"> Email </span></td>
+            </div>
         </tr>
         </tbody>
     </table>

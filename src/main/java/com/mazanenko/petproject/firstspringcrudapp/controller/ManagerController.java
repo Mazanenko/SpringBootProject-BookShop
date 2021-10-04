@@ -1,11 +1,16 @@
 package com.mazanenko.petproject.firstspringcrudapp.controller;
 
+import com.mazanenko.petproject.firstspringcrudapp.entity.Manager;
 import com.mazanenko.petproject.firstspringcrudapp.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/people/managers")
@@ -21,5 +26,70 @@ public class ManagerController {
     public String showAllManagers(Model model) {
         model.addAttribute("managers", managerService.getAllManagers());
         return "/people/managers/managers-list";
+    }
+
+    @GetMapping("/{id}")
+    public String showManager(@PathVariable("id") int id, Model model) {
+        model.addAttribute("manager", managerService.getManagerById(id));
+        return "/people/managers/show-manager";
+    }
+
+
+    @GetMapping("/new")
+    public String newManager(Model model) {
+        model.addAttribute("manager", new Manager());
+        return "/people/managers/new-manager";
+    }
+
+    @PostMapping
+    public String createManager(@ModelAttribute("manager") @Valid Manager manager, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "/people/managers/new-manager";
+        } else {
+            try {
+                managerService.createManager(manager);
+            } catch (DataAccessException e) {
+                if (e.getCause().getMessage().contains("email_unique")) {
+                    bindingResult.addError(new FieldError("manager", "email"
+                            , manager.getEmail() + " already registered! Please, input new one."));
+                }
+                return "/people/managers/new-manager";
+            }
+        }
+        return "redirect:/people/managers";
+    }
+
+
+    @GetMapping("/{id}/edit")
+    public String editManager(@PathVariable("id") int id, Model model) {
+        model.addAttribute("manager", managerService.getManagerById(id));
+        return "/people/managers/edit-manager";
+    }
+
+    @PatchMapping("/{id}")
+    public String updateManager(@ModelAttribute("manager") @Valid Manager manager, BindingResult bindingResult
+            , @PathVariable("id") int id) {
+
+        if (bindingResult.hasErrors()) {
+            return "/people/managers/edit-manager";
+        } else {
+            try {
+                managerService.updateManagerById(id, manager);
+            } catch (DataAccessException e) {
+
+                if (e.getCause().getMessage().contains("email_unique")) {
+                    bindingResult.addError(new FieldError("manager", "email"
+                            , manager.getEmail() + " already registered! Please, input new one."));
+                }
+                return "/people/managers/edit-manager";
+            }
+        }
+        return "redirect:/people/managers";
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteManager(@PathVariable("id") int id) {
+        managerService.deleteManagerById(id);
+        return "redirect:/people/managers";
     }
 }

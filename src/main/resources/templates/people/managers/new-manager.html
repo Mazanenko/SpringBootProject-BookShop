@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New manager</title>
+    <link th:include="/import/style.html">
+    <link th:include="/import/formStyle.html">
+</head>
+<style>
+    input:disabled,
+    input[disabled]{
+        border: 1px solid #999999;
+        background-color: #cccccc;
+        color: #666666;
+    }
+</style>
+
+<body>
+<link th:include="/import/header.html">
+
+<h3>Enter manager info:</h3>
+
+<div class="container">
+
+    <form th:method="POST" th:action="@{/people/managers}" >
+        <div th:object="${manager}">
+            <label for="name">Name: </label>
+            <input type="text" th:field="*{name}" id="name"/>
+            <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">name error</div>
+            <br/>
+            <label for="surname">Surname: </label>
+            <input type="text" th:field="*{surname}" id="surname"/>
+            <div style="color: red" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}">surname error</div>
+            <br/>
+            <label for="email">Email: </label>
+            <input type="text" th:field="*{email}" id="email"/>
+            <div style="color: red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">email error</div>
+            <br/>
+            <div style="color: red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">password error</div>
+            <label for="password">Password: </label>
+            <input type="password" th:field="*{password}" id="password" onkeyup='check();'/>
+
+            <label for="confirm_password">Confirm password: </label>
+            <input type="password" id="confirm_password" onkeyup='check();'/>
+            <span id='message'></span>
+        </div>
+        <br/>
+        <input type="submit" value="Next" id="submit" disabled="disabled">
+    </form>
+</div>
+
+<script>
+    function check() {
+        var pass = document.getElementById('password');
+        var rPass = document.getElementById('confirm_password');
+
+        if (pass.value == rPass.value) {
+            document.getElementById('message').style.color = 'green';
+            document.getElementById('message').innerHTML = 'matching';
+            document.getElementById('submit').disabled = false;
+        } else {
+            document.getElementById('message').style.color = 'red';
+            document.getElementById('message').innerHTML = 'Passwords not matched';
+            document.getElementById('submit').disabled = true;
+        }
+    }
+</script>
+</body>
+</html>

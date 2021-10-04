@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title th:if="${book != null}" th:text="${book.getName()}">Title</title>
@@ -26,13 +27,15 @@
     <p th:text="'Quantity: ' + ${book.getAvailableQuantity()}"></p>
 
 
-    <a th:href="@{/books/{id}/edit-book(id=${book.getId()})}">
-        <button class="btn warning">Edit</button>
-    </a>
+    <div sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+        <a th:href="@{/books/{id}/edit-book(id=${book.getId()})}">
+            <button class="btn warning">Edit</button>
+        </a>
 
-    <form th:method="DELETE" th:action="@{/books/{id}(id=${book.getId()})}">
-        <button class="btn danger">Delete</button>
-    </form>
+        <form th:method="DELETE" th:action="@{/books/{id}(id=${book.getId()})}">
+            <button class="btn danger">Delete</button>
+        </form>
+    </div>
 </div>
 </body>
 </html>

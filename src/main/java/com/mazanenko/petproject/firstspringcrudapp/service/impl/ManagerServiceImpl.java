@@ -4,6 +4,7 @@ import com.mazanenko.petproject.firstspringcrudapp.dao.impl.ManagerDAO;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Manager;
 import com.mazanenko.petproject.firstspringcrudapp.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public void createManager(Manager manager) {
+        String cryptedPassword = BCrypt.hashpw(manager.getPassword(), BCrypt.gensalt());
+        manager.setPassword(cryptedPassword);
         managerDAO.create(manager);
     }
 
@@ -40,6 +43,8 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public void updateManagerById(int id, Manager manager) {
+        String cryptedPassword = BCrypt.hashpw(manager.getPassword(), BCrypt.gensalt());
+        manager.setPassword(cryptedPassword);
         managerDAO.update(id, manager);
     }
 
