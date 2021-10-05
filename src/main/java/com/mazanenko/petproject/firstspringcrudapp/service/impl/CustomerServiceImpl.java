@@ -57,7 +57,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer getCustomerByEmail(String email) {
-        return customerDAO.readByEmail(email);
+        Customer customer = customerDAO.readByEmail(email);
+        if (customer != null) {
+            customer.setDeliveryAddress(addressDAO.read(customer.getId()));
+        }
+        return customer;
     }
 
     @Override

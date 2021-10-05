@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Customer profile</title>
@@ -8,12 +9,10 @@
 <body>
 
 <link th:include="/import/header.html">
-
 <br/>
-
 <div th:if="${customer == null}">Customer does not exist.</div>
 
-<div th:unless="${customer == null}">
+<div style="margin-left:20px;" th:unless="${customer == null}">
     <h3>Customer info:</h3>
 
     <p th:text="'Name: ' + ${customer.getName()}"></p>
@@ -37,13 +36,11 @@
             <p th:text="'Note: ' + ${customer.getDeliveryAddress().getNote()}"></p>
         </div>
     </div>
-
     <br/>
 
     <a th:href="@{{id}/edit(id=${customer.getId()})}">
         <button class="btn warning">Edit customer</button>
     </a>
-
     <br/>
     <br/>
 

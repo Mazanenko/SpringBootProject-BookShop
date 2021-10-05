@@ -21,7 +21,6 @@ public class Customer extends Person {
     public Customer(int id, String name, String surname, String gender, String phone, String email, String password
             , DeliveryAddress deliveryAddress, Cart cart, String role) {
         super(id, name, email, surname, password, role);
-        super.setRole("ROLE_CUSTOMER");
         this.gender = gender;
         this.phone = phone;
         this.deliveryAddress = deliveryAddress;

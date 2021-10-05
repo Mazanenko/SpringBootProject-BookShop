@@ -12,7 +12,7 @@
 
 <div class="container">
 
-    <form th:method="PATCH" th:action="@{/people/customers/{id}(id=${customer.getId()})}">
+    <form th:method="PATCH" th:action="@{/people/customers/profile/{id}(id=${customer.getId()})}">
 
         <div th:object="${customer}">
             <h3>Enter new info:</h3>
