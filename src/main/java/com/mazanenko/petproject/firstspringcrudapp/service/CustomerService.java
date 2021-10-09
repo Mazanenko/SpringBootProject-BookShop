@@ -17,4 +17,6 @@ public interface CustomerService {
     void updateCustomerById(int id, Customer updatedCustomer, DeliveryAddress address);
 
     void deleteCustomerById(int id);
+
+    void deleteCustomerByEmail(String email);
 }

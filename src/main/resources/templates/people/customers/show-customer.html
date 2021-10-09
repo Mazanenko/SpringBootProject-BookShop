@@ -38,15 +38,34 @@
     </div>
     <br/>
 
-    <a th:href="@{{id}/edit(id=${customer.getId()})}">
-        <button class="btn warning">Edit customer</button>
-    </a>
+    <div name="edit_btn">
+        <div sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+            <a th:href="@{{id}/edit(id=${customer.getId()})}">
+                <button class="btn warning">Edit customer</button>
+            </a>
+        </div>
+        <div sec:authorize="hasRole('CUSTOMER')">
+            <a th:href="@{profile/edit}">
+                <button class="btn warning">Edit customer</button>
+            </a>
+        </div>
+    </div>
     <br/>
-    <br/>
+    <div name="delete_btn">
+        <div sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+            <form th:method="DELETE" th:action="@{profile/{id}(id=${customer.getId()})}"
+                  onclick="return confirm('Are you sure, you wanted to delete this profile?')">
+                <button class="btn danger" >Delete customer</button>
+            </form>
+        </div>
+        <div sec:authorize="hasRole('CUSTOMER')">
+            <form th:method="DELETE" th:action="@{profile/delete}"
+                  onclick="return confirm('Are you sure, you wanted to delete this profile?')">
+                <button class="btn danger" >Delete customer</button>
+            </form>
+        </div>
+    </div>
 
-    <form th:method="DELETE" th:action="@{{id}(id=${customer.getId()})}">
-        <button class="btn danger" >Delete customer</button>
-    </form>
 
     <br/>
 </div>

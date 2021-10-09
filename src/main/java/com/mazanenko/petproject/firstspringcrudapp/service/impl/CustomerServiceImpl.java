@@ -71,9 +71,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void updateCustomerById(int id, Customer updatedCustomer, DeliveryAddress updatedAddress) {
-        String cryptedPassword = BCrypt.hashpw(updatedCustomer.getPassword(), BCrypt.gensalt());
-        updatedCustomer.setPassword(cryptedPassword);
-
+        if (!(updatedCustomer.getPassword().equals(customerDAO.read(id).getPassword()))) {
+            String cryptedPassword = BCrypt.hashpw(updatedCustomer.getPassword(), BCrypt.gensalt());
+            updatedCustomer.setPassword(cryptedPassword);
+        }
         customerDAO.update(id, updatedCustomer);
         addressDAO.update(id, updatedAddress);
     }
@@ -81,5 +82,10 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void deleteCustomerById(int id) {
         customerDAO.delete(id);
+    }
+
+    @Override
+    public void deleteCustomerByEmail(String email) {
+        customerDAO.delete(email);
     }
 }

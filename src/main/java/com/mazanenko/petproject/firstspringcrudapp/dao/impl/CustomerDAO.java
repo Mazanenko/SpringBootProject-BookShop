@@ -47,11 +47,15 @@ public class CustomerDAO implements DAO<Customer> {
     public void update(int id, Customer customer) {
         jdbcTemplate.update("UPDATE customer SET name = ?, surname = ?, gender = ?, phone = ?, email = ?, password = ? WHERE id = ?",
                 customer.getName(), customer.getSurname(), customer.getGender(), customer.getPhone(), customer.getEmail()
-                , customer.getPassword(), customer.getId());
+                , customer.getPassword(), id);
     }
 
     @Override
     public void delete(int id) {
         jdbcTemplate.update("DELETE FROM customer WHERE id = ?", id);
+    }
+
+    public void delete(String email) {
+        jdbcTemplate.update("DELETE FROM customer WHERE email = ?", email);
     }
 }

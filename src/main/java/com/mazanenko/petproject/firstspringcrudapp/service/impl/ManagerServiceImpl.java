@@ -43,8 +43,11 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public void updateManagerById(int id, Manager manager) {
-        String cryptedPassword = BCrypt.hashpw(manager.getPassword(), BCrypt.gensalt());
-        manager.setPassword(cryptedPassword);
+        if(!(manager.getPassword().equals(managerDAO.read(id).getPassword()))) {
+            String cryptedPassword = BCrypt.hashpw(manager.getPassword(), BCrypt.gensalt());
+            manager.setPassword(cryptedPassword);
+        }
+
         managerDAO.update(id, manager);
     }
 

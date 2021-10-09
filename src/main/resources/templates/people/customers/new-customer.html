@@ -22,7 +22,7 @@
 
 <div class="container">
 
-    <form th:method="POST" th:action="@{/people/customers}" >
+    <form th:method="POST" th:action="@{/people/customers/create}" >
         <div th:object="${customer}">
             <label for="name">Name: </label>
             <input type="text" th:field="*{name}" id="name"/>

@@ -26,11 +26,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/", "/books", "/books/{id}").permitAll()
+                .antMatchers("/", "/books", "/books/{id}", "/people/customers/new"
+                        , "/people/customers/create").permitAll()
                 .antMatchers("/cart/**", "/people/customers/profile/**").authenticated()
                 .antMatchers("/books/**", "/people/customers/**").hasAnyRole("ADMIN", "MANAGER")
                 .antMatchers("/people/managers/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
+
                 .and()
                 .formLogin().permitAll()
                 .and()
@@ -50,16 +51,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationProvider.setUserDetailsService(userService);
         return authenticationProvider;
     }
-
-
-//        @Override
-//    @Bean
-//    protected UserDetailsService userDetailsService() {
-//        UserDetails admin = User.builder()
-//                .username("admin1")
-//                .password("{bcrypt}$2a$12$Ev5SL85V.tM6w3VDORW9C.SLuPUIK5AbfIAcL2QhLHJ.gYCoyzrN6")
-//                .roles("ADMIN")
-//                .build();
-//        return new InMemoryUserDetailsManager(admin);
-//    }
 }

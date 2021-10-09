@@ -3,10 +3,16 @@ package com.mazanenko.petproject.firstspringcrudapp.controller;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
+import org.apache.catalina.security.SecurityListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.expression.SecurityExpressionOperations;
+import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -14,6 +20,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
 
@@ -28,12 +36,14 @@ public class CustomerController {
     }
 
     @GetMapping()
+    @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
     public String showAllCustomers(Model model) {
         model.addAttribute("customers", customerService.getAllCustomers());
         return "/people/customers/customers-list";
     }
 
     @GetMapping("/{id}")
+    @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
     public String showCustomer(@PathVariable("id") int id, Model model) {
         model.addAttribute("customer", customerService.getCustomerById(id));
         return "/people/customers/show-customer";
@@ -53,12 +63,15 @@ public class CustomerController {
         return "/people/customers/new-customer";
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public String createCustomer(@ModelAttribute("customer") @Valid Customer customer,
                                  BindingResult customerResult,
                                  @ModelAttribute("address") @Valid DeliveryAddress address,
-                                 BindingResult addressResult) {
-        if (customerResult.hasErrors() || addressResult.hasErrors()) {
+                                 BindingResult addressResult, HttpServletRequest httpServletRequest) {
+
+        String tempPass = customer.getPassword();
+
+           if (customerResult.hasErrors() || addressResult.hasErrors()) {
             return "/people/customers/new-customer";
         } else {
             try {
@@ -72,12 +85,17 @@ public class CustomerController {
                 }
                 return "/people/customers/new-customer";
             }
-            return "redirect:/people/customers";
+            if (!(authenticated())) {
+                authWithHttpServletRequest(httpServletRequest, customer.getEmail(), tempPass);
+                return "redirect:/";
+            }
+               return "redirect:/people/customers";
         }
     }
 
 
     @GetMapping("/{id}/edit")
+    @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
     public String editCustomer(@PathVariable("id") int id, ModelMap model) {
         model.addAttribute("customer", customerService.getCustomerById(id));
         model.addAttribute("address", customerService.getCustomerById(id).getDeliveryAddress());
@@ -92,13 +110,17 @@ public class CustomerController {
         return "/people/customers/edit-customer";
     }
 
-    @PatchMapping("/profile/{id}")
+    @PatchMapping(value = {"/profile/{id}", "/profile/update"})
     public String updateCustomer(@ModelAttribute("customer") @Valid Customer customer,
                                  BindingResult customerResult,
                                  @ModelAttribute("address") @Valid DeliveryAddress address,
-                                 BindingResult addressResult, @PathVariable("id") int id) {
+                                 BindingResult addressResult, @PathVariable(required = false) Integer id,
+                                 Principal principal) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // needed for user can't be able to change other user profile by changing {id} in edit form
+        if (id == null) {
+            id = customerService.getCustomerByEmail(principal.getName()).getId();
+        }
 
         if (customerResult.hasErrors() || addressResult.hasErrors()) {
             return "/people/customers/edit-customer";
@@ -114,19 +136,51 @@ public class CustomerController {
                 }
                 return "/people/customers/edit-customer";
             }
-
-            if (authentication.getAuthorities().stream()
-                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CUSTOMER"))) {
+            // if true return customer profile page for customers
+            if (authenticatedUserIsCustomer()) {
                 return "redirect:/people/customers/profile";
             } else return "redirect:/people/customers";
-
         }
     }
 
 
-    @DeleteMapping("/{id}")
-    public String deleteCustomer(@PathVariable("id") int id) {
-        customerService.deleteCustomerById(id);
-        return "redirect:/people/customers";
+    @DeleteMapping(value = {"/profile/{id}", "/profile/delete"})
+    public String deleteCustomer(@PathVariable(required = false) Integer id, Principal principal) {
+        if (id == null) {
+            customerService.deleteCustomerByEmail(principal.getName());
+        } else {
+            customerService.deleteCustomerById(id);
+        }
+
+        if (authenticatedUserIsCustomer()) {
+            SecurityContextHolder.clearContext();
+            return "redirect:/";
+        } else {
+            return "redirect:/people/customers";
+        }
+    }
+
+
+    private boolean authenticatedUserIsCustomer() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CUSTOMER"));
+    }
+
+    private boolean authenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (authentication != null) && (authentication.isAuthenticated())
+                && !(authentication instanceof AnonymousAuthenticationToken);
+    }
+
+    public void authWithHttpServletRequest(HttpServletRequest request, String username, String password) {
+
+        try {
+            request.login(username, password);
+        } catch (ServletException e) {
+            System.out.println("error while login" + e.getMessage());
+            e.printStackTrace();
+        }
+
     }
 }
