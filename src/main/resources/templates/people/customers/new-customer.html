@@ -23,7 +23,7 @@
 <div class="container">
 
     <form th:method="POST" th:action="@{/people/customers/create}" >
-        <div th:object="${customer}">
+        <div name="customer_details_form" th:object="${customer}">
             <label for="name">Name: </label>
             <input type="text" th:field="*{name}" id="name"/>
             <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">name error</div>
@@ -54,8 +54,8 @@
             <input type="password" id="confirm_password" onkeyup='check();'/>
             <span id='message'></span>
         </div>
-
-        <div th:object="${address}">
+        <br/>
+        <div name="address_form" th:object="${address}">
                     <h3>Enter delivery address:</h3>
 
             <label for="country">Country: </label>

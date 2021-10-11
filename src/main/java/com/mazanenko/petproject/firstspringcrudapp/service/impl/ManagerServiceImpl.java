@@ -47,7 +47,6 @@ public class ManagerServiceImpl implements ManagerService {
             String cryptedPassword = BCrypt.hashpw(manager.getPassword(), BCrypt.gensalt());
             manager.setPassword(cryptedPassword);
         }
-
         managerDAO.update(id, manager);
     }
 

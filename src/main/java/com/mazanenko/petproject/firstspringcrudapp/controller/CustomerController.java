@@ -3,16 +3,12 @@ package com.mazanenko.petproject.firstspringcrudapp.controller;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
-import org.apache.catalina.security.SecurityListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.expression.SecurityExpressionOperations;
-import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -71,7 +67,7 @@ public class CustomerController {
 
         String tempPass = customer.getPassword();
 
-           if (customerResult.hasErrors() || addressResult.hasErrors()) {
+        if (customerResult.hasErrors() || addressResult.hasErrors()) {
             return "/people/customers/new-customer";
         } else {
             try {
@@ -89,7 +85,7 @@ public class CustomerController {
                 authWithHttpServletRequest(httpServletRequest, customer.getEmail(), tempPass);
                 return "redirect:/";
             }
-               return "redirect:/people/customers";
+            return "redirect:/people/customers";
         }
     }
 
@@ -174,13 +170,11 @@ public class CustomerController {
     }
 
     public void authWithHttpServletRequest(HttpServletRequest request, String username, String password) {
-
         try {
             request.login(username, password);
         } catch (ServletException e) {
             System.out.println("error while login" + e.getMessage());
             e.printStackTrace();
         }
-
     }
 }

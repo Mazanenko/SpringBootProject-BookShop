@@ -27,15 +27,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/", "/books", "/books/{id}", "/people/customers/new"
-                        , "/people/customers/create").permitAll()
+                        , "/people/customers/create", "/static/**").permitAll()
                 .antMatchers("/cart/**", "/people/customers/profile/**").authenticated()
                 .antMatchers("/books/**", "/people/customers/**").hasAnyRole("ADMIN", "MANAGER")
-                .antMatchers("/people/managers/**").hasRole("ADMIN")
-
+                .antMatchers("/**").hasRole("ADMIN")
                 .and()
                 .formLogin().permitAll()
                 .and()
                 .logout().logoutSuccessUrl("/");
+
     }
 
     @Bean
