@@ -7,9 +7,11 @@ import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
+import com.mazanenko.petproject.firstspringcrudapp.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.List;
 
@@ -19,12 +21,15 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerDAO customerDAO;
     private final DeliveryAddressDAO addressDAO;
     private final CartDAO cartDAO;
+    private final EmailService emailService;
 
     @Autowired
-    public CustomerServiceImpl(CustomerDAO customerDAO, DeliveryAddressDAO addressDAO, CartDAO cartDAO) {
+    public CustomerServiceImpl(CustomerDAO customerDAO, DeliveryAddressDAO addressDAO, CartDAO cartDAO
+            , EmailService emailService) {
         this.customerDAO = customerDAO;
         this.addressDAO = addressDAO;
         this.cartDAO = cartDAO;
+        this.emailService = emailService;
     }
 
     @Override
@@ -44,6 +49,12 @@ public class CustomerServiceImpl implements CustomerService {
         cart.setCustomerId(tempCustomer.getId());
         customer.setCart(cart);
         cartDAO.create(cart);
+
+        if (!StringUtils.isEmpty(customer.getEmail())) {
+            String message = String.format("Hello, %s! \n" + "Welcome to Booksland! You already complete " +
+                    "registration and now You can order as many books as you want.", customer.getName());
+            emailService.sendSimpleMessage(customer.getEmail(), "Registration on booksland", message);
+        }
     }
 
     @Override
