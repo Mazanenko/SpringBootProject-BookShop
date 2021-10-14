@@ -22,9 +22,10 @@ public class CustomerDAO implements DAO<Customer> {
 
     @Override
     public void create(Customer customer) {
-        jdbcTemplate.update("INSERT INTO customer (name, surname, gender, phone, email, password) VALUES (?, ?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO customer (name, surname, gender, phone, email, password, activation_code) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)",
                 customer.getName(), customer.getSurname(), customer.getGender(), customer.getPhone()
-                , customer.getEmail(), customer.getPassword());
+                , customer.getEmail(), customer.getPassword(), customer.getActivationCode());
     }
 
     @Override
@@ -38,6 +39,11 @@ public class CustomerDAO implements DAO<Customer> {
                 .stream().findAny().orElse(null);
     }
 
+    public Customer readByActivationCode(String code) {
+        return jdbcTemplate.query("SELECT * FROM customer WHERE activation_code = ?", new CustomerMapper(), code)
+                .stream().findAny().orElse(null);
+    }
+
     @Override
     public List<Customer> readAll() {
         return jdbcTemplate.query("SELECT * FROM customer", new CustomerMapper());
@@ -45,9 +51,10 @@ public class CustomerDAO implements DAO<Customer> {
 
     @Override
     public void update(int id, Customer customer) {
-        jdbcTemplate.update("UPDATE customer SET name = ?, surname = ?, gender = ?, phone = ?, email = ?, password = ? WHERE id = ?",
+        jdbcTemplate.update("UPDATE customer SET name = ?, surname = ?, gender = ?, phone = ?, email = ?" +
+                        ", password = ?, activation_code = ?, activated = ? WHERE id = ?",
                 customer.getName(), customer.getSurname(), customer.getGender(), customer.getPhone(), customer.getEmail()
-                , customer.getPassword(), id);
+                , customer.getPassword(), customer.getActivationCode(), customer.isActivated(), id);
     }
 
     @Override

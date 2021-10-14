@@ -12,6 +12,9 @@ public class Customer extends Person {
     @NotBlank(message = "Must be not empty")
     private String phone;
 
+    private boolean activated;
+    private String activationCode;
+
     private DeliveryAddress deliveryAddress;
     private Cart cart;
 
@@ -57,6 +60,22 @@ public class Customer extends Person {
 
     public void setCart(Cart cart) {
         this.cart = cart;
+    }
+
+    public boolean isActivated() {
+        return activated;
+    }
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
+
+    public String getActivationCode() {
+        return activationCode;
+    }
+
+    public void setActivationCode(String activationCode) {
+        this.activationCode = activationCode;
     }
 
     @Override

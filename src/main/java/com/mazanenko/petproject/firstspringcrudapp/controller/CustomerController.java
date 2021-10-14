@@ -6,8 +6,6 @@ import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,8 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
 
@@ -63,9 +59,7 @@ public class CustomerController {
     public String createCustomer(@ModelAttribute("customer") @Valid Customer customer,
                                  BindingResult customerResult,
                                  @ModelAttribute("address") @Valid DeliveryAddress address,
-                                 BindingResult addressResult, HttpServletRequest httpServletRequest) {
-
-        String tempPass = customer.getPassword();
+                                 BindingResult addressResult) {
 
         if (customerResult.hasErrors() || addressResult.hasErrors()) {
             return "/people/customers/new-customer";
@@ -75,20 +69,26 @@ public class CustomerController {
             } catch (DataAccessException e) {
 
                 if (e.getCause().getMessage().contains("unique_email")) {
-
                     customerResult.addError(new FieldError("customer", "email"
                             , customer.getEmail() + " already registered! Please, input new one."));
                 }
                 return "/people/customers/new-customer";
             }
-            if (!(authenticated())) {
-                authWithHttpServletRequest(httpServletRequest, customer.getEmail(), tempPass);
+            if (!customerService.isAuthenticated()) {
                 return "redirect:/";
-            }
-            return "redirect:/people/customers";
+            } else return "redirect:/people/customers";
         }
     }
 
+    @GetMapping("/activate/{code}")
+    public String accountActivation(Model model, @PathVariable("code") String code) {
+        if (customerService.activateUser(code)) {
+            model.addAttribute("message", "Account successfully activated!");
+        } else {
+            model.addAttribute("message", "Activation code not found.");
+        }
+        return "/people/customers/activate-customer";
+    }
 
     @GetMapping("/{id}/edit")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
@@ -133,7 +133,7 @@ public class CustomerController {
                 return "/people/customers/edit-customer";
             }
             // if true return customer profile page for customers
-            if (authenticatedUserIsCustomer()) {
+            if (customerService.authenticatedUserIsCustomer()) {
                 return "redirect:/people/customers/profile";
             } else return "redirect:/people/customers";
         }
@@ -148,33 +148,11 @@ public class CustomerController {
             customerService.deleteCustomerById(id);
         }
 
-        if (authenticatedUserIsCustomer()) {
+        if (customerService.authenticatedUserIsCustomer()) {
             SecurityContextHolder.clearContext();
             return "redirect:/";
         } else {
             return "redirect:/people/customers";
-        }
-    }
-
-
-    private boolean authenticatedUserIsCustomer() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CUSTOMER"));
-    }
-
-    private boolean authenticated() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (authentication != null) && (authentication.isAuthenticated())
-                && !(authentication instanceof AnonymousAuthenticationToken);
-    }
-
-    public void authWithHttpServletRequest(HttpServletRequest request, String username, String password) {
-        try {
-            request.login(username, password);
-        } catch (ServletException e) {
-            System.out.println("error while login" + e.getMessage());
-            e.printStackTrace();
         }
     }
 }

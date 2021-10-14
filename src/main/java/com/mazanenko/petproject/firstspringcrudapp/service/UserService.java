@@ -1,6 +1,7 @@
 package com.mazanenko.petproject.firstspringcrudapp.service;
 
 
+import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,11 +28,14 @@ public class UserService implements UserDetailsService {
     }
 
     public Person findByEmail(String email) throws UsernameNotFoundException {
-        Person customer = customerService.getCustomerByEmail(email);
+        Customer customer = customerService.getCustomerByEmail(email);
         Person manager = managerService.getManagerByEmail(email);
 
         if (customer != null) {
-            return customer;
+            if (customer.isActivated()) {
+                return customer;
+            } else throw new UsernameNotFoundException(String.format("Email %s not activated yet", email));
+
         } else {
             if (manager != null) {
                 return manager;
@@ -43,7 +47,6 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Person person = findByEmail(email);
         return new User(person.getEmail(), person.getPassword(), rolesToAuthorities(person.getRole()));
-
     }
 
 

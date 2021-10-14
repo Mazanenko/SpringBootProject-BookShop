@@ -9,11 +9,17 @@ import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
 import com.mazanenko.petproject.firstspringcrudapp.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -34,13 +40,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void createCustomer(Customer customer, DeliveryAddress address) {
-        Customer tempCustomer;
 
         String cryptedPassword = BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt());
         customer.setPassword(cryptedPassword);
+        customer.setActivationCode(UUID.randomUUID().toString());
         customerDAO.create(customer);
 
-        tempCustomer = customerDAO.readByEmail(customer.getEmail());
+        Customer tempCustomer = customerDAO.readByEmail(customer.getEmail());
         address.setCustomerId(tempCustomer.getId());
 
         addressDAO.create(address);
@@ -51,8 +57,9 @@ public class CustomerServiceImpl implements CustomerService {
         cartDAO.create(cart);
 
         if (!StringUtils.isEmpty(customer.getEmail())) {
-            String message = String.format("Hello, %s! \n" + "Welcome to Booksland! You already complete " +
-                    "registration and now You can order as many books as you want.", customer.getName());
+            String message = String.format("Hello, %s! \n" + "Welcome to Booksland! Please, visit next link: " +
+                            "http://localhost:8080/people/customers/activate/%s to activate your account and complete registration."
+                    , customer.getName(), customer.getActivationCode());
             emailService.sendSimpleMessage(customer.getEmail(), "Registration on booksland", message);
         }
     }
@@ -98,5 +105,41 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void deleteCustomerByEmail(String email) {
         customerDAO.delete(email);
+    }
+
+    @Override
+    public void authWithHttpServletRequest(HttpServletRequest request, String username, String password) {
+        try {
+            request.login(username, password);
+        } catch (ServletException e) {
+            System.out.println("error while login" + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean authenticatedUserIsCustomer() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CUSTOMER"));
+    }
+
+    @Override
+    public boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (authentication != null) && (authentication.isAuthenticated())
+                && !(authentication instanceof AnonymousAuthenticationToken);
+    }
+
+    @Override
+    public boolean activateUser(String code) {
+        Customer customer = customerDAO.readByActivationCode(code);
+        if (customer != null) {
+            customer.setActivationCode(null);
+            customer.setActivated(true);
+            customerDAO.update(customer.getId(), customer);
+            return true;
+        }
+        return false;
     }
 }

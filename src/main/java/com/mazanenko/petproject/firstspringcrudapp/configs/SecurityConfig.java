@@ -27,7 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/", "/books", "/books/{id}", "/people/customers/new"
-                        , "/people/customers/create", "/static/**").permitAll()
+                        , "/people/customers/create", "/people/customers/activate/*", "/static/**").permitAll()
                 .antMatchers("/cart/**", "/people/customers/profile/**").authenticated()
                 .antMatchers("/books/**", "/people/customers/**").hasAnyRole("ADMIN", "MANAGER")
                 .antMatchers("/**").hasRole("ADMIN")
@@ -35,7 +35,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().permitAll()
                 .and()
                 .logout().logoutSuccessUrl("/");
-
     }
 
     @Bean

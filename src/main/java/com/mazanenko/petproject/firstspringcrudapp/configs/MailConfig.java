@@ -43,7 +43,7 @@ public class MailConfig {
         Properties properties = javaMailSender.getJavaMailProperties();
         properties.setProperty("mail.transport.protocol", protocol);
         properties.setProperty("mail.smtp.auth", auth);
-        properties.setProperty("mail.debug", "true");
+        //properties.setProperty("mail.debug", "true");
 
         return javaMailSender;
     }
