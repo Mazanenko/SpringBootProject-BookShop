@@ -58,7 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         if (!StringUtils.isEmpty(customer.getEmail())) {
             String message = String.format("Hello, %s! \n" + "Welcome to Booksland! Please, visit next link: " +
-                            "http://localhost:8080/people/customers/activate/%s to activate your account and complete registration."
+                            "http://localhost:8080/customer/activate/%s to activate your account and complete registration."
                     , customer.getName(), customer.getActivationCode());
             emailService.sendSimpleMessage(customer.getEmail(), "Registration on booksland", message);
         }

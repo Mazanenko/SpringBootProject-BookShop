@@ -18,7 +18,7 @@ import javax.validation.Valid;
 import java.security.Principal;
 
 @Controller
-@RequestMapping("/people/customers")
+@RequestMapping("/customer")
 public class CustomerController {
     private final CustomerService customerService;
 
@@ -59,7 +59,7 @@ public class CustomerController {
     public String createCustomer(@ModelAttribute("customer") @Valid Customer customer,
                                  BindingResult customerResult,
                                  @ModelAttribute("address") @Valid DeliveryAddress address,
-                                 BindingResult addressResult) {
+                                 BindingResult addressResult, Model model) {
 
         if (customerResult.hasErrors() || addressResult.hasErrors()) {
             return "/people/customers/new-customer";
@@ -75,8 +75,9 @@ public class CustomerController {
                 return "/people/customers/new-customer";
             }
             if (!customerService.isAuthenticated()) {
-                return "redirect:/";
-            } else return "redirect:/people/customers";
+                model.addAttribute("message", "Please, check your email for message for confirm registration!");
+                return "/people/customers/activate-customer";
+            } else return "redirect:/customer";
         }
     }
 
@@ -134,8 +135,8 @@ public class CustomerController {
             }
             // if true return customer profile page for customers
             if (customerService.authenticatedUserIsCustomer()) {
-                return "redirect:/people/customers/profile";
-            } else return "redirect:/people/customers";
+                return "redirect:/customer/profile";
+            } else return "redirect:/customer";
         }
     }
 
@@ -152,7 +153,7 @@ public class CustomerController {
             SecurityContextHolder.clearContext();
             return "redirect:/";
         } else {
-            return "redirect:/people/customers";
+            return "redirect:/customer";
         }
     }
 }

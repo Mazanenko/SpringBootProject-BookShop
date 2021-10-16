@@ -13,13 +13,13 @@
 
 
 <div class="container" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
-    <form th:method="PATCH" th:action="@{/people/customers/profile/{id}(id=${customer.getId()})}">
+    <form th:method="PATCH" th:action="@{/customer/profile/{id}(id=${customer.getId()})}">
         <link th:include="/import/customerEditForm.html">
     </form>
 </div>
 
 <div class="container" sec:authorize="hasRole('CUSTOMER')">
-    <form th:method="PATCH" th:action="@{/people/customers/profile/update}">
+    <form th:method="PATCH" th:action="@{/customer/profile/update}">
             <link th:include="/import/customerEditForm.html">
     </form>
 </div>

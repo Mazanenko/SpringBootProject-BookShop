@@ -12,7 +12,7 @@
 <link th:include="/import/header.html">
 <br/>
 
-<a sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" th:href="@{/people/managers/new}">
+<a sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" th:href="@{/manager/new}">
     <button class="btn success">Add new manager</button>
 </a>
 
@@ -34,15 +34,13 @@
         <tr th:if="${managers.isEmpty()}">
             <td colspan="2"> No managers yet </td>
         </tr>
-        <tr th:each="manager : ${managers}">
-            <div th:unless="${manager.getEmail()} == 'admin'">
+        <tr th:each="manager : ${managers}" th:unless="${manager.getEmail()} == 'admin'">
                 <td><span th:text="${manager.getId()}"> Id </span></td>
-                <td><a th:href="@{/people/managers/{id}(id=${manager.getId()})}">
+                <td><a th:href="@{/manager/{id}(id=${manager.getId()})}">
                     <span  th:text="${manager.getName()}"> Name </span>
                 </a></td>
                 <td><span th:text="${manager.getSurname()}"> Surname </span></td>
                 <td><span th:text="${manager.getEmail()}"> Email </span></td>
-            </div>
         </tr>
         </tbody>
     </table>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Manager profile</title>
@@ -8,7 +9,6 @@
 <body>
 
 <link th:include="/import/header.html">
-
 <br/>
 
 <div th:if="${manager == null}">Manager does not exist.</div>
@@ -21,21 +21,20 @@
     <p th:text="'Email: ' + ${manager.getEmail()}"></p>
 
     <br/>
-
-    <a th:href="@{{id}/edit(id=${manager.getId()})}">
-        <button class="btn warning">Edit manager</button>
-    </a>
-
+    <div name="edit_btn" sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{{id}/edit(id=${manager.getId()})}">
+            <button class="btn warning">Edit manager</button>
+        </a>
+    </div>
     <br/>
     <br/>
-
-    <form th:method="DELETE" th:action="@{{id}(id=${manager.getId()})}">
-        <button class="btn danger" >Delete manager</button>
-    </form>
-
+    <div name="delete_btn" sec:authorize="hasRole('ADMIN')">
+        <form name="delete_form" th:method="DELETE" th:action="@{{id}(id=${manager.getId()})}"
+              onclick="return confirm('Are you sure, you wanted to delete this profile?')">
+            <button class="btn danger">Delete manager</button>
+        </form>
+    </div>
     <br/>
 </div>
-
-
 </body>
 </html>

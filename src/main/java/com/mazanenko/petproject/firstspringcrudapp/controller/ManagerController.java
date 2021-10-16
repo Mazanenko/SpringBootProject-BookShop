@@ -4,6 +4,7 @@ import com.mazanenko.petproject.firstspringcrudapp.entity.Manager;
 import com.mazanenko.petproject.firstspringcrudapp.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,9 +12,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @Controller
-@RequestMapping("/people/managers")
+@RequestMapping("/manager")
 public class ManagerController {
     private final ManagerService managerService;
 
@@ -23,14 +25,22 @@ public class ManagerController {
     }
 
     @GetMapping()
+    @Secured("ROLE_ADMIN")
     public String showAllManagers(Model model) {
         model.addAttribute("managers", managerService.getAllManagers());
         return "/people/managers/managers-list";
     }
 
     @GetMapping("/{id}")
+    @Secured("ROLE_ADMIN")
     public String showManager(@PathVariable("id") int id, Model model) {
         model.addAttribute("manager", managerService.getManagerById(id));
+        return "/people/managers/show-manager";
+    }
+
+    @GetMapping("/profile")
+    public String showProfileForManager(Principal principal, Model model) {
+        model.addAttribute("manager", managerService.getManagerByEmail(principal.getName()));
         return "/people/managers/show-manager";
     }
 
@@ -56,7 +66,7 @@ public class ManagerController {
                 return "/people/managers/new-manager";
             }
         }
-        return "redirect:/people/managers";
+        return "redirect:/manager";
     }
 
 
@@ -84,12 +94,12 @@ public class ManagerController {
                 return "/people/managers/edit-manager";
             }
         }
-        return "redirect:/people/managers";
+        return "redirect:/manager";
     }
 
     @DeleteMapping("/{id}")
     public String deleteManager(@PathVariable("id") int id) {
         managerService.deleteManagerById(id);
-        return "redirect:/people/managers";
+        return "redirect:/manager";
     }
 }

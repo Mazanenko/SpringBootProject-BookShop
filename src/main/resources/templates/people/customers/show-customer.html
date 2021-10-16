@@ -46,7 +46,7 @@
         </div>
         <div sec:authorize="hasRole('CUSTOMER')">
             <a th:href="@{profile/edit}">
-                <button class="btn warning">Edit customer</button>
+                <button class="btn warning">Edit profile</button>
             </a>
         </div>
     </div>
@@ -61,7 +61,7 @@
         <div sec:authorize="hasRole('CUSTOMER')">
             <form th:method="DELETE" th:action="@{profile/delete}"
                   onclick="return confirm('Are you sure, you wanted to delete this profile?')">
-                <button class="btn danger" >Delete customer</button>
+                <button class="btn danger" >Delete profile</button>
             </form>
         </div>
     </div>
