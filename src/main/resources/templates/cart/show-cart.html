@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Cart</title>
     <link th:include="/import/style.html">
+    <link th:include="/import/tableStyle.html">
 </head>
 <body>
 
@@ -17,27 +18,30 @@
 <div th:unless="${cart == null}" style="overflow-x:auto;">
     <div th:if="${cart.getOrderList().isEmpty()}">No orders yet.</div>
 
-    <div th:unless="${cart.getOrderList().isEmpty()}">
+    <div name="orders_table" th:unless="${cart.getOrderList().isEmpty()}">
         <table>
             <thead>
             <tr>
-                <th>cart id</th>
+
                 <th>product id</th>
+                <th>product name</th>
+                <th>product author</th>
                 <th>Quantity</th>
             </tr>
             </thead>
 
             <tbody>
-            <tr th:unless="${cart.getOrderList().isEmpty()}" th:each="order : ${cart.getOrderList()}">
-                <td><span th:text="${order.getCartId()}"> cart id </span></td>
+            <tr th:each="order : ${cart.getOrderList()}">
+
                 <td><a th:href="@{/books/{id}(id=${order.getProductId()})}">
                     <span th:text="${order.getProductId()}"> product id </span>
                 </a></td>
+                <td><span th:text="${order.getBook().getName()}"> name </span></td>
+                <td><span th:text="${order.getBook().getAuthor()}"> author </span></td>
                 <td><span th:text="${order.getQuantity()}"> quantity </span></td>
             </tr>
             </tbody>
         </table>
-
     </div>
 
 </div>

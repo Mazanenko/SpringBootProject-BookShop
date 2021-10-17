@@ -7,6 +7,10 @@ public interface CartService {
 
     Cart getCartById(int cartId);
 
+    Cart getCartByCustomerEmail(String email);
+
+    Cart getCartByCustomerId(int id);
+
     void addOrderToCartById(Order order);
 
     void updateOrderInCartById(int orderId, Order order);

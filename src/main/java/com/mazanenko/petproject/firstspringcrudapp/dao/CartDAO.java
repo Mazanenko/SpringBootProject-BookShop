@@ -10,6 +10,8 @@ public interface CartDAO {
 
     Cart read(int id);
 
+    Cart readByCustomerId(int id);
+
     List<Cart> readAll();
 
     void update(int id, Cart cart);

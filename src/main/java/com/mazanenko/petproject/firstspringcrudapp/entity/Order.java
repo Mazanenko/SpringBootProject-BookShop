@@ -7,8 +7,7 @@ public class Order {
     private int productId;
     private int quantity;
 
-    // no need?
-//    private Product product;
+    private Book book;
 
     public Order() {
     }
@@ -49,6 +48,14 @@ public class Order {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public Book getBook() {
+        return book;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
     }
 
     @Override

@@ -36,12 +36,12 @@
 
         <tbody>
         <tr th:if="${customers.isEmpty()}">
-            <td colspan="2"> No customers yet </td>
+            <td colspan="2"> No customers yet</td>
         </tr>
         <tr th:each="customer : ${customers}">
             <td><span th:text="${customer.getId()}"> Id </span></td>
             <td><a th:href="@{/customer/{id}(id=${customer.getId()})}">
-                <span  th:text="${customer.getName()}"> Name </span>
+                <span th:text="${customer.getName()}"> Name </span>
             </a></td>
             <td><span th:text="${customer.getSurname()}"> Surname </span></td>
             <td><span th:text="${customer.getPhone()}"> Phone </span></td>

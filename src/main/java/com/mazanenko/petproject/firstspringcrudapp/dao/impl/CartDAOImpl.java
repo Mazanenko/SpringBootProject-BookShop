@@ -3,6 +3,7 @@ package com.mazanenko.petproject.firstspringcrudapp.dao.impl;
 import com.mazanenko.petproject.firstspringcrudapp.dao.CartDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.mapper.CartMapper;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ public class CartDAOImpl implements CartDAO {
 
     private final JdbcTemplate jdbcTemplate;
 
+    @Autowired
     public CartDAOImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -25,6 +27,12 @@ public class CartDAOImpl implements CartDAO {
     @Override
     public Cart read(int id) {
         return jdbcTemplate.query("SELECT * FROM cart WHERE id = ?", new CartMapper(), id)
+                .stream().findAny().orElse(null);
+    }
+
+    @Override
+    public Cart readByCustomerId(int id) {
+        return jdbcTemplate.query("SELECT * FROM cart WHERE customer_id = ?", new CartMapper(), id)
                 .stream().findAny().orElse(null);
     }
 
