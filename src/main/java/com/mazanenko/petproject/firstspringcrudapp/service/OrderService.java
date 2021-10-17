@@ -10,11 +10,17 @@ public interface OrderService {
 
     Order readOrder(int id);
 
+    Order readOrderByCartIdAndProductId(int cartId, int productId);
+
     List<Order> readAllOrders();
 
     List<Order> readALLOrdersByCartId(int cartId);
 
     void updateOrder(int id, Order order);
+
+    void incrementOrderQuantity(int orderId);
+
+    void decrementOrderQuantity(int orderId);
 
     void deleteOrder(int id);
 

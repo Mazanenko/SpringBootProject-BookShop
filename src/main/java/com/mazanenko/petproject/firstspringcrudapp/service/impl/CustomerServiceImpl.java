@@ -69,6 +69,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerDAO.read(id);
         if (customer != null) {
             customer.setDeliveryAddress(addressDAO.read(id));
+            customer.setCart(cartDAO.readByCustomerId(id));
         }
         return customer;
     }
@@ -78,6 +79,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerDAO.readByEmail(email);
         if (customer != null) {
             customer.setDeliveryAddress(addressDAO.read(customer.getId()));
+            customer.setCart(cartDAO.readByCustomerId(customer.getId()));
         }
         return customer;
     }

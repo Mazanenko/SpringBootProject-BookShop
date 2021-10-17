@@ -26,8 +26,15 @@
     <p th:text="'Price: ' + ${book.getPrice()}"></p>
     <p th:text="'Quantity: ' + ${book.getAvailableQuantity()}"></p>
 
+    <div sec:authorize="hasRole('CUSTOMER')" th:if="${book.getAvailableQuantity() > 0}">
+        <form th:method="POST" th:action="@{/cart/add-{bookId}(bookId=${book.getId()})}">
+            <button class="btn success">Add to cart</button>
+        </form>
+    </div>
 
-    <div sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+    <p th:if="${book.getAvailableQuantity() == 0" >This book not available yet.</p>
+
+    <div sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" >
         <a th:href="@{/books/{id}/edit-book(id=${book.getId()})}">
             <button class="btn warning">Edit</button>
         </a>

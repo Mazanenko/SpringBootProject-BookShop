@@ -45,6 +45,12 @@ public class BookDAOImpl implements BookDAO {
     }
 
     @Override
+    public void updateQuantity(int bookId, int newQuantity) {
+        jdbcTemplate.update("UPDATE book SET available_quantity = ? WHERE id = ?",
+                newQuantity, bookId);
+    }
+
+    @Override
     public void delete(int id) {
         jdbcTemplate.update("DELETE FROM book WHERE id = ?", id);
     }

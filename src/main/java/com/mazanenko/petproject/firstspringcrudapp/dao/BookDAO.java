@@ -14,5 +14,7 @@ public interface BookDAO {
 
     void update(int id, Book book);
 
+    void updateQuantity(int bookId, int newQuantity);
+
     void delete(int id);
 }

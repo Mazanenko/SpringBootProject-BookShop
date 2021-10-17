@@ -32,6 +32,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Order readOrderByCartIdAndProductId(int cartId, int productId) {
+        return orderDAO.readOrderByCartIdAndProductId(cartId, productId);
+    }
+
+    @Override
     public List<Order> readAllOrders() {
         return orderDAO.readAll();
     }
@@ -50,6 +55,27 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void updateOrder(int id, Order order) {
         orderDAO.update(id, order);
+    }
+
+    @Override
+    public void incrementOrderQuantity(int orderId) {
+        Order order = readOrder(orderId);
+        int quantity = order.getQuantity();
+        order.setQuantity(++quantity);
+        updateOrder(orderId, order);
+    }
+
+    @Override
+    public void decrementOrderQuantity(int orderId) {
+        Order order = readOrder(orderId);
+        int quantity = order.getQuantity();
+
+        if (quantity > 1) {
+            order.setQuantity(--quantity);
+            updateOrder(orderId, order);
+        } else {
+            deleteOrder(orderId);
+        }
     }
 
     @Override

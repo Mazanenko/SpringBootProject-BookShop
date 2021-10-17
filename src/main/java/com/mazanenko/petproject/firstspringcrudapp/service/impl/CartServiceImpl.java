@@ -4,11 +4,15 @@ import com.mazanenko.petproject.firstspringcrudapp.dao.CartDAO;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Order;
+import com.mazanenko.petproject.firstspringcrudapp.service.BookService;
 import com.mazanenko.petproject.firstspringcrudapp.service.CartService;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
 import com.mazanenko.petproject.firstspringcrudapp.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.SQLException;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -16,12 +20,14 @@ public class CartServiceImpl implements CartService {
     private final CartDAO cartDAO;
     private final OrderService orderService;
     private final CustomerService customerService;
+    private final BookService bookService;
 
     @Autowired
-    public CartServiceImpl(CartDAO cartDAO, OrderService orderService, CustomerService customerService) {
+    public CartServiceImpl(CartDAO cartDAO, OrderService orderService, CustomerService customerService, BookService bookService) {
         this.cartDAO = cartDAO;
         this.orderService = orderService;
         this.customerService = customerService;
+        this.bookService = bookService;
     }
 
     @Override
@@ -49,8 +55,17 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void addOrderToCartById(Order order) {
-        orderService.createOrder(order);
+    @Transactional(rollbackFor = {SQLException.class})
+    public void addOrderToCartById(Order order) throws SQLException {
+        Order tempOrder = orderService.readOrderByCartIdAndProductId(order.getCartId(), order.getProductId());
+
+        if (tempOrder == null) {
+            orderService.createOrder(order);
+        } else {
+            orderService.incrementOrderQuantity(tempOrder.getId());
+        }
+
+        bookService.decrementBookQuantity(order.getProductId());
     }
 
     @Override

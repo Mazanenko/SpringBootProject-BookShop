@@ -15,7 +15,7 @@ public class OrderMapper implements RowMapper<Order> {
         order.setCartId(resultSet.getInt("cart_id"));
         order.setProductId(resultSet.getInt("product_id"));
         order.setQuantity(resultSet.getInt("quantity"));
-
+        order.setId(resultSet.getInt("id"));
         return order;
     }
 }

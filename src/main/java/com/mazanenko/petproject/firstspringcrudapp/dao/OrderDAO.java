@@ -10,6 +10,8 @@ public interface OrderDAO {
 
     Order read(int id);
 
+    Order readOrderByCartIdAndProductId(int cartId, int productId);
+
     List<Order> readAll();
 
     List<Order> readALLByCartId(int cartId);

@@ -34,6 +34,12 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
+    public Order readOrderByCartIdAndProductId(int cartId, int productId) {
+        return jdbcTemplate.query("SELECT * FROM order_table WHERE cart_id = ? and product_id = ?"
+                        , new OrderMapper(), cartId, productId).stream().findAny().orElse(null);
+    }
+
+    @Override
     public List<Order> readAll() {
         return jdbcTemplate.query("SELECT * FROM order_table", new OrderMapper());
     }

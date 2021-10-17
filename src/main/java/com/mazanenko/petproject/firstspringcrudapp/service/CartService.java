@@ -3,6 +3,8 @@ package com.mazanenko.petproject.firstspringcrudapp.service;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Order;
 
+import java.sql.SQLException;
+
 public interface CartService {
 
     Cart getCartById(int cartId);
@@ -11,7 +13,7 @@ public interface CartService {
 
     Cart getCartByCustomerId(int id);
 
-    void addOrderToCartById(Order order);
+    void addOrderToCartById(Order order) throws SQLException;
 
     void updateOrderInCartById(int orderId, Order order);
 
