@@ -1,7 +1,7 @@
 package com.mazanenko.petproject.firstspringcrudapp.service.impl;
 
-import com.mazanenko.petproject.firstspringcrudapp.dao.impl.CartDAO;
-import com.mazanenko.petproject.firstspringcrudapp.dao.impl.OrderDAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.CartDAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.OrderDAO;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Order;
 import com.mazanenko.petproject.firstspringcrudapp.service.CartService;
@@ -46,6 +46,6 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void deleteAllOrdersFromCart(int cartId) {
-        orderDAO.deleteAll(cartId);
+        orderDAO.deleteAllByCartId(cartId);
     }
 }

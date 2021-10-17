@@ -1,6 +1,6 @@
 package com.mazanenko.petproject.firstspringcrudapp.dao.impl;
 
-import com.mazanenko.petproject.firstspringcrudapp.dao.DAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.OrderDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.mapper.OrderMapper;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Order;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class OrderDAO implements DAO<Order> {
+public class OrderDAOImpl implements OrderDAO {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public OrderDAO(JdbcTemplate jdbcTemplate) {
+    public OrderDAOImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -38,6 +38,7 @@ public class OrderDAO implements DAO<Order> {
         return jdbcTemplate.query("SELECT * FROM order_table", new OrderMapper());
     }
 
+    @Override
     public List<Order> readALLByCartId(int cartId) {
         return jdbcTemplate.query("SELECT * FROM order_table WHERE cart_id = ?", new OrderMapper(), cartId);
     }
@@ -53,7 +54,8 @@ public class OrderDAO implements DAO<Order> {
         jdbcTemplate.update("DELETE FROM order_table WHERE id = ?", id);
     }
 
-    public void deleteAll(int cartId) {
+    @Override
+    public void deleteAllByCartId(int cartId) {
         jdbcTemplate.update("DELETE FROM order_table WHERE cart_id = ?", cartId);
     }
 }

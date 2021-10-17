@@ -28,8 +28,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/", "/books", "/books/{id}", "/customer/new"
                         , "/customer/create", "/customer/activate/**", "/static/**").permitAll()
-                .antMatchers("/cart/**", "/customer/profile/**").authenticated()
-                .antMatchers("/books/**", "/customer/**", "/manager/profile").hasRole("MANAGER")
+                .antMatchers("/cart/**", "/customer/profile/**").hasRole("CUSTOMER")
+                .antMatchers("/books/**", "/manager/profile", "/customer/**").hasAnyRole("MANAGER", "ADMIN")
                 .antMatchers("/**").hasRole("ADMIN")
                 .and()
                 .formLogin().permitAll()

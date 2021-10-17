@@ -1,6 +1,6 @@
 package com.mazanenko.petproject.firstspringcrudapp.service.impl;
 
-import com.mazanenko.petproject.firstspringcrudapp.dao.impl.BookDAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.BookDAO;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
 import com.mazanenko.petproject.firstspringcrudapp.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;

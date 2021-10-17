@@ -1,6 +1,6 @@
 package com.mazanenko.petproject.firstspringcrudapp.dao.impl;
 
-import com.mazanenko.petproject.firstspringcrudapp.dao.DAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.ManagerDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.mapper.ManagerMapper;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Manager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class ManagerDAO implements DAO<Manager> {
+public class ManagerDAOImpl implements ManagerDAO {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public ManagerDAO(JdbcTemplate jdbcTemplate) {
+    public ManagerDAOImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

@@ -1,6 +1,6 @@
 package com.mazanenko.petproject.firstspringcrudapp.dao.impl;
 
-import com.mazanenko.petproject.firstspringcrudapp.dao.DAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.DeliveryAddressDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.mapper.DeliveryAddressMapper;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class DeliveryAddressDAO implements DAO<DeliveryAddress> {
+public class DeliveryAddressDAOImpl implements DeliveryAddressDAO {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public DeliveryAddressDAO(JdbcTemplate jdbcTemplate) {
+    public DeliveryAddressDAOImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

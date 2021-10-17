@@ -1,8 +1,8 @@
 package com.mazanenko.petproject.firstspringcrudapp.service.impl;
 
-import com.mazanenko.petproject.firstspringcrudapp.dao.impl.CartDAO;
-import com.mazanenko.petproject.firstspringcrudapp.dao.impl.CustomerDAO;
-import com.mazanenko.petproject.firstspringcrudapp.dao.impl.DeliveryAddressDAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.CartDAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.CustomerDAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.DeliveryAddressDAO;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
@@ -104,7 +104,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteCustomerByEmail(String email) {
-        customerDAO.delete(email);
+        customerDAO.deleteByEmail(email);
     }
 
     @Override

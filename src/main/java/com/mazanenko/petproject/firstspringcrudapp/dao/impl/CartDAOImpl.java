@@ -1,6 +1,6 @@
 package com.mazanenko.petproject.firstspringcrudapp.dao.impl;
 
-import com.mazanenko.petproject.firstspringcrudapp.dao.DAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.CartDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.mapper.CartMapper;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class CartDAO implements DAO<Cart> {
+public class CartDAOImpl implements CartDAO {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public CartDAO(JdbcTemplate jdbcTemplate) {
+    public CartDAOImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

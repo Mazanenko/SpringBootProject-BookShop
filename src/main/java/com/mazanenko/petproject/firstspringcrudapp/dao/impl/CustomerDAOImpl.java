@@ -1,6 +1,6 @@
 package com.mazanenko.petproject.firstspringcrudapp.dao.impl;
 
-import com.mazanenko.petproject.firstspringcrudapp.dao.DAO;
+import com.mazanenko.petproject.firstspringcrudapp.dao.CustomerDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.mapper.CustomerMapper;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class CustomerDAO implements DAO<Customer> {
+public class CustomerDAOImpl implements CustomerDAO {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public CustomerDAO(JdbcTemplate jdbcTemplate) {
+    public CustomerDAOImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -34,11 +34,13 @@ public class CustomerDAO implements DAO<Customer> {
                 .stream().findAny().orElse(null);
     }
 
+    @Override
     public Customer readByEmail(String email) {
         return jdbcTemplate.query("SELECT * FROM customer WHERE email = ?", new CustomerMapper(), email)
                 .stream().findAny().orElse(null);
     }
 
+    @Override
     public Customer readByActivationCode(String code) {
         return jdbcTemplate.query("SELECT * FROM customer WHERE activation_code = ?", new CustomerMapper(), code)
                 .stream().findAny().orElse(null);
@@ -62,7 +64,8 @@ public class CustomerDAO implements DAO<Customer> {
         jdbcTemplate.update("DELETE FROM customer WHERE id = ?", id);
     }
 
-    public void delete(String email) {
+    @Override
+    public void deleteByEmail(String email) {
         jdbcTemplate.update("DELETE FROM customer WHERE email = ?", email);
     }
 }
