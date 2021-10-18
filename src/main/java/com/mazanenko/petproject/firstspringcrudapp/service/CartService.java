@@ -13,11 +13,11 @@ public interface CartService {
 
     Cart getCartByCustomerId(int id);
 
-    void addOrderToCartById(Order order) throws SQLException;
+    void addOrderToCart(Order order) throws SQLException;
 
     void updateOrderInCartById(int orderId, Order order);
 
-    void deleteOrderFromCartById(int orderId);
+    void deleteOrderFromCart(int productId, Cart cart);
 
     void deleteAllOrdersFromCart(int cartId);
 }

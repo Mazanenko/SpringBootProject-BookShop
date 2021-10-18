@@ -9,11 +9,9 @@
 <body>
 
 <link th:include="/import/header.html">
-
 <br/>
 
 <div th:if="${cart == null}">Customer does not exist.</div>
-
 
 <div th:unless="${cart == null}" style="overflow-x:auto;">
     <div th:if="${cart.getOrderList().isEmpty()}">No orders yet.</div>
@@ -23,28 +21,35 @@
             <thead>
             <tr>
 
-                <th>product id</th>
+                <th hidden="hidden">product id</th>
                 <th>product name</th>
                 <th>product author</th>
                 <th>Quantity</th>
+                <th></th>
             </tr>
             </thead>
 
             <tbody>
             <tr th:each="order : ${cart.getOrderList()}">
 
+                <td hidden="hidden"><span th:text="${order.getProductId()}"> product id </span></td>
+
                 <td><a th:href="@{/books/{id}(id=${order.getProductId()})}">
-                    <span th:text="${order.getProductId()}"> product id </span>
-                </a></td>
-                <td><span th:text="${order.getBook().getName()}"> name </span></td>
+                    <span th:text="${order.getBook().getName()}"> name </span></a></td>
+
                 <td><span th:text="${order.getBook().getAuthor()}"> author </span></td>
-                <td><span th:text="${order.getQuantity()}"> quantity </span></td>
+
+                <td style="text-align: center"><span th:text="${order.getQuantity()}"> quantity </span></td>
+
+                <td>
+                    <form th:method="DELETE" th:action="@{/cart/delete-{bookId}(bookId=${order.getProductId()})}">
+                        <button style="padding:  10px 20px;" class="btn danger">Delete</button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>
     </div>
-
 </div>
-
 </body>
 </html>

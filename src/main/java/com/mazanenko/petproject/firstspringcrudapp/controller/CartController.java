@@ -44,6 +44,7 @@ public class CartController {
         return "/cart/show-cart";
     }
 
+    //not complete
     @PostMapping("/{id}/add")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
     public String addToCart(@ModelAttribute("order") Order order, @PathVariable("id") int id) {
@@ -53,20 +54,30 @@ public class CartController {
     @PostMapping("/add-{bookId}")
     public String addToCartForCustomer(@PathVariable("bookId") int bookId, Principal principal) {
 
-        Customer customer = customerService.getCustomerByEmail(principal.getName());
-        int cartId = customer.getCart().getId();
-        Order order = new Order(cartId, bookId, 1);
+        if (customerService.authenticatedUserIsCustomer()) {
+            Customer customer = customerService.getCustomerByEmail(principal.getName());
+            int cartId = customer.getCart().getId();
+            Order order = new Order(cartId, bookId, 1);
 
-        if (bookService.isBookAvailable(order.getProductId())) {
-            //order.setCartId(cartId);
-            try {
-                cartService.addOrderToCartById(order);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (bookService.isBookAvailable(order.getProductId())) {
+                try {
+                    cartService.addOrderToCart(order);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                return "redirect:/cart";
             }
-            return "redirect:/cart";
         }
         return "redirect:/books";
+    }
+
+    @DeleteMapping("/delete-{bookId}")
+    public String deleteFromCartForCustomer(@PathVariable("bookId") int bookId, Principal principal) {
+        if (customerService.authenticatedUserIsCustomer()) {
+            Cart cart = cartService.getCartByCustomerEmail(principal.getName());
+            cartService.deleteOrderFromCart(bookId, cart);
+        }
+        return "redirect:/cart";
     }
 
 }

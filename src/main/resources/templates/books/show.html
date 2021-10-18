@@ -32,7 +32,7 @@
         </form>
     </div>
 
-    <p th:if="${book.getAvailableQuantity() == 0" >This book not available yet.</p>
+    <p th:if="${book.getAvailableQuantity() == 0}" >This book not available yet.</p>
 
     <div sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" >
         <a th:href="@{/books/{id}/edit-book(id=${book.getId()})}">

@@ -1,6 +1,7 @@
 package com.mazanenko.petproject.firstspringcrudapp.service.impl;
 
 import com.mazanenko.petproject.firstspringcrudapp.dao.CartDAO;
+import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Order;
@@ -56,7 +57,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional(rollbackFor = {SQLException.class})
-    public void addOrderToCartById(Order order) throws SQLException {
+    public void addOrderToCart(Order order) throws SQLException {
         Order tempOrder = orderService.readOrderByCartIdAndProductId(order.getCartId(), order.getProductId());
 
         if (tempOrder == null) {
@@ -64,7 +65,6 @@ public class CartServiceImpl implements CartService {
         } else {
             orderService.incrementOrderQuantity(tempOrder.getId());
         }
-
         bookService.decrementBookQuantity(order.getProductId());
     }
 
@@ -74,8 +74,18 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void deleteOrderFromCartById(int orderId) {
-        orderService.deleteOrder(orderId);
+    @Transactional(rollbackFor = {SQLException.class})
+    public void deleteOrderFromCart(int productId, Cart cart) {
+        Book book = bookService.getBookById(productId);
+
+        cart.getOrderList().forEach(order -> {
+            if (order.getProductId() == productId) {
+                int newQuantity = book.getAvailableQuantity() + order.getQuantity();
+
+                orderService.deleteOrder(order.getId());
+                bookService.setQuantity(productId, newQuantity);
+            }
+        });
     }
 
     @Override
