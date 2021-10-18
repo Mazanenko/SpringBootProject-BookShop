@@ -71,6 +71,28 @@ public class CartController {
         return "redirect:/books";
     }
 
+    @PatchMapping("increment-{bookId}")
+    public String incrementProduct(@PathVariable("bookId") int bookId, Principal principal) {
+        if (customerService.authenticatedUserIsCustomer()) {
+            Cart cart = cartService.getCartByCustomerEmail(principal.getName());
+            try {
+                cartService.incrementProduct(bookId, cart);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return "redirect:/cart";
+    }
+
+    @PatchMapping("decrement-{bookId}")
+    public String decrementProduct(@PathVariable("bookId") int bookId, Principal principal) {
+        if (customerService.authenticatedUserIsCustomer()) {
+            Cart cart = cartService.getCartByCustomerEmail(principal.getName());
+            cartService.decrementProduct(bookId, cart);
+        }
+        return "redirect:/cart";
+    }
+
     @DeleteMapping("/delete-{bookId}")
     public String deleteFromCartForCustomer(@PathVariable("bookId") int bookId, Principal principal) {
         if (customerService.authenticatedUserIsCustomer()) {

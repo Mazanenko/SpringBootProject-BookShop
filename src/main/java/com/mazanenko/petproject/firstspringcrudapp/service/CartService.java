@@ -15,6 +15,10 @@ public interface CartService {
 
     void addOrderToCart(Order order) throws SQLException;
 
+    void incrementProduct(int productId, Cart cart) throws SQLException;
+
+    void decrementProduct(int productId, Cart cart);
+
     void updateOrderInCartById(int orderId, Order order);
 
     void deleteOrderFromCart(int productId, Cart cart);

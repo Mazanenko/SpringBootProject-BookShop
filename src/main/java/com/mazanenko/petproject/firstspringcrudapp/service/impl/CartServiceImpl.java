@@ -69,6 +69,31 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional(rollbackFor = {SQLException.class})
+    public void incrementProduct(int productId, Cart cart) throws SQLException {
+
+        for (Order order : cart.getOrderList()) {
+            if (order.getProductId() == productId) {
+
+                bookService.decrementBookQuantity(bookService.getBookById(productId).getId());
+                orderService.incrementOrderQuantity(order.getId());
+            }
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = {SQLException.class})
+    public void decrementProduct(int productId, Cart cart) {
+
+        cart.getOrderList().forEach(order -> {
+            if (order.getProductId() == productId) {
+                orderService.decrementOrderQuantity(order.getId());
+                bookService.incrementBookQuantity(bookService.getBookById(productId).getId());
+            }
+        });
+    }
+
+    @Override
     public void updateOrderInCartById(int orderId, Order order) {
         orderService.updateOrder(orderId, order);
     }
