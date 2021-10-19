@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.sql.SQLException;
@@ -38,9 +40,10 @@ public class CartController {
     }
 
     @GetMapping()
-    public String showCartForCustomer(Principal principal, Model model) {
+    public String showCartForCustomer(@RequestParam(required = false) String error, Principal principal, ModelMap model) {
         Cart cart = cartService.getCartByCustomerEmail(principal.getName());
         model.addAttribute("cart", cart);
+        model.addAttribute("error", error);
         return "/cart/show-cart";
     }
 
@@ -72,13 +75,15 @@ public class CartController {
     }
 
     @PatchMapping("increment-{bookId}")
-    public String incrementProduct(@PathVariable("bookId") int bookId, Principal principal) {
+    public String incrementProduct(@PathVariable("bookId") int bookId, Principal principal,
+                                   RedirectAttributes attributes) {
         if (customerService.authenticatedUserIsCustomer()) {
             Cart cart = cartService.getCartByCustomerEmail(principal.getName());
             try {
                 cartService.incrementProduct(bookId, cart);
             } catch (SQLException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                attributes.addAttribute("error", "No more available books");
             }
         }
         return "redirect:/cart";
@@ -94,11 +99,10 @@ public class CartController {
     }
 
     @DeleteMapping("/delete-{bookId}")
+    @Secured("ROLE_CUSTOMER")
     public String deleteFromCartForCustomer(@PathVariable("bookId") int bookId, Principal principal) {
-        if (customerService.authenticatedUserIsCustomer()) {
             Cart cart = cartService.getCartByCustomerEmail(principal.getName());
             cartService.deleteOrderFromCart(bookId, cart);
-        }
         return "redirect:/cart";
     }
 

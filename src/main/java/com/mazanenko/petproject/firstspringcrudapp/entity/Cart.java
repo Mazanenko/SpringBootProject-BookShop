@@ -1,7 +1,9 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Cart {
     private int id;
@@ -39,6 +41,12 @@ public class Cart {
 
     public void setOrderList(List<Order> orderList) {
         this.orderList = orderList;
+    }
+
+
+    public List<Order> getSortedOrderList() {
+        return orderList.stream().sorted((Comparator.comparing(o -> o.getBook().getName())))
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -18,8 +18,10 @@ import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -86,7 +88,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<Customer> getAllCustomers() {
-        return customerDAO.readAll();
+        return customerDAO.readAll().stream().sorted(Comparator.comparing(Customer::getId))
+                .collect(Collectors.toList());
     }
 
     @Override

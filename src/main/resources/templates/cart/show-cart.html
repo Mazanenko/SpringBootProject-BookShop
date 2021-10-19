@@ -30,7 +30,7 @@
             </thead>
 
             <tbody>
-            <tr th:each="order : ${cart.getOrderList()}">
+            <tr th:each="order : ${cart.getSortedOrderList()}">
 
                 <td hidden="hidden"><span th:text="${order.getProductId()}"> product id </span></td>
 
@@ -61,6 +61,13 @@
             </tr>
             </tbody>
         </table>
+
+        <div th:if="${error}">
+            <script>
+                window.alert('These books are no longer available!');
+            </script>
+        </div>
+
     </div>
 </div>
 </body>

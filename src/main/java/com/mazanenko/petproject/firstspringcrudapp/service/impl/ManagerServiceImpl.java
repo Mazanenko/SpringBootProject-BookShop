@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ManagerServiceImpl implements ManagerService {
@@ -38,7 +40,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public List<Manager> getAllManagers() {
-        return managerDAO.readAll();
+        return managerDAO.readAll().stream().sorted(Comparator.comparing(Manager::getId)).collect(Collectors.toList());
     }
 
     @Override
