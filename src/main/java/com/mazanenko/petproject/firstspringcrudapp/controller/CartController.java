@@ -32,15 +32,16 @@ public class CartController {
         this.customerService = customerService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{customerId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String showCart(@PathVariable("id") int id, Model model) {
-        model.addAttribute("cart", cartService.getCartById(id));
+    public String showCart(@PathVariable("customerId") int customerId, Model model) {
+        model.addAttribute("cart", cartService.getCartByCustomerId(customerId));
         return "/cart/show-cart";
     }
 
     @GetMapping()
-    public String showCartForCustomer(@RequestParam(required = false) String error, Principal principal, ModelMap model) {
+    public String showCartForCustomer(@RequestParam(required = false) String error,
+                                      Principal principal, ModelMap model) {
         Cart cart = cartService.getCartByCustomerEmail(principal.getName());
         model.addAttribute("cart", cart);
         model.addAttribute("error", error);
@@ -82,7 +83,7 @@ public class CartController {
             try {
                 cartService.incrementProduct(bookId, cart);
             } catch (SQLException e) {
-                //e.printStackTrace();
+                // not good enough
                 attributes.addAttribute("error", "No more available books");
             }
         }
@@ -104,6 +105,16 @@ public class CartController {
             Cart cart = cartService.getCartByCustomerEmail(principal.getName());
             cartService.deleteOrderFromCart(bookId, cart);
         return "redirect:/cart";
+    }
+
+    @DeleteMapping("/{customerId}/delete-{bookId}")
+    @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
+    public String deleteFromCartForManager(@PathVariable("customerId") int customerId,
+                                           @PathVariable("bookId") int bookId) {
+
+        Cart cart = cartService.getCartByCustomerId(customerId);
+        cartService.deleteOrderFromCart(bookId, cart);
+        return "redirect:/cart/{customerId}";
     }
 
 }

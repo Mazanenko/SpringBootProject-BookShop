@@ -30,6 +30,7 @@
             <th>Surname</th>
             <th>Phone</th>
             <th>Email</th>
+            <th></th>
         </tr>
         </thead>
 
@@ -45,6 +46,12 @@
             <td><span th:text="${customer.getSurname()}"> Surname </span></td>
             <td><span th:text="${customer.getPhone()}"> Phone </span></td>
             <td><span th:text="${customer.getEmail()}"> Email </span></td>
+
+            <td sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+                <a th:href="@{/cart/{customerId}(customerId=${customer.getId()})}">
+                    <button style="padding:  10px 20px;" class="btn info">Cart</button>
+                </a>
+            </td>
         </tr>
         </tbody>
     </table>

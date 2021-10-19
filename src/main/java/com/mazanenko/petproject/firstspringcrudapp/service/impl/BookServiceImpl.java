@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -30,7 +32,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> getAllBooks() {
-        return bookDAO.readAll();
+        return bookDAO.readAll().stream().sorted(Comparator.comparing(Book::getName)).collect(Collectors.toList());
     }
 
     @Override

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Cart</title>
@@ -22,8 +22,8 @@
             <tr>
 
                 <th hidden="hidden">product id</th>
-                <th>product name</th>
-                <th>product author</th>
+                <th>title</th>
+                <th>author</th>
                 <th>Quantity</th>
                 <th></th>
             </tr>
@@ -54,7 +54,12 @@
                     </td>
 
                 <td>
-                    <form th:method="DELETE" th:action="@{/cart/delete-{bookId}(bookId=${order.getProductId()})}">
+                    <form sec:authorize="hasRole('CUSTOMER')" th:method="DELETE"
+                          th:action="@{/cart/delete-{bookId}(bookId=${order.getProductId()})}">
+                        <button style="padding:  10px 20px;" class="btn danger">Delete</button>
+                    </form>
+                    <form sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" th:method="DELETE"
+                          th:action="@{/cart/{id}/delete-{bookId}(id=${cart.getCustomerId()}, bookId=${order.getProductId()})}">
                         <button style="padding:  10px 20px;" class="btn danger">Delete</button>
                     </form>
                 </td>
@@ -64,7 +69,8 @@
 
         <div th:if="${error}">
             <script>
-                window.alert('These books are no longer available!');
+                window.alert('This is maximum quantity we have at this moment for this book!\n' +
+                    'Please, come back later to buy more.');
             </script>
         </div>
 
