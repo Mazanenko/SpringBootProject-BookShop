@@ -98,6 +98,7 @@ public class CustomerServiceImpl implements CustomerService {
             String cryptedPassword = BCrypt.hashpw(updatedCustomer.getPassword(), BCrypt.gensalt());
             updatedCustomer.setPassword(cryptedPassword);
         }
+        updatedCustomer.setActivated(true);
         customerDAO.update(id, updatedCustomer);
         addressDAO.update(id, updatedAddress);
     }

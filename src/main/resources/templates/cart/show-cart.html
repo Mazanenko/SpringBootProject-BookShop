@@ -41,13 +41,21 @@
 
                 <td style="text-align: center">
                     <div>
-                        <form th:method="PATCH" th:action="@{/cart/increment-{bookId}(bookId=${order.getProductId()})}">
+                        <form sec:authorize="hasRole('CUSTOMER')" th:method="PATCH" th:action="@{/cart/increment-{bookId}(bookId=${order.getProductId()})}">
+                            <button>&#708;</button>
+                        </form>
+                        <form sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" th:method="PATCH"
+                              th:action="@{/cart/{customerId}/increment-{bookId}(customerId=${cart.getCustomerId()}, bookId=${order.getProductId()})}">
                             <button>&#708;</button>
                         </form>
 
                         <h3 th:text="${order.getQuantity()}"> quantity</h3>
 
-                        <form th:method="PATCH" th:action="@{/cart/decrement-{bookId}(bookId=${order.getProductId()})}">
+                        <form sec:authorize="hasRole('CUSTOMER')" th:method="PATCH" th:action="@{/cart/decrement-{bookId}(bookId=${order.getProductId()})}">
+                            <button>&#709;</button>
+                        </form>
+                        <form sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" th:method="PATCH"
+                              th:action="@{/cart/{customerId}/decrement-{bookId}(customerId=${cart.getCustomerId()}, bookId=${order.getProductId()})}">
                             <button>&#709;</button>
                         </form>
                     </div>
@@ -71,6 +79,7 @@
             <script>
                 window.alert('This is maximum quantity we have at this moment for this book!\n' +
                     'Please, come back later to buy more.');
+                window.location.href = "/cart"
             </script>
         </div>
 

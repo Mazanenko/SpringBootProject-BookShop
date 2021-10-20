@@ -115,7 +115,7 @@ public class CustomerController {
                                  Principal principal) {
 
         // needed for user can't be able to change other user profile by changing {id} in edit form
-        if (id == null) {
+        if (customerService.authenticatedUserIsCustomer()) {
             id = customerService.getCustomerByEmail(principal.getName()).getId();
         }
 

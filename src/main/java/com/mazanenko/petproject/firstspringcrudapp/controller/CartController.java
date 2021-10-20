@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.sql.SQLException;
@@ -40,11 +39,9 @@ public class CartController {
     }
 
     @GetMapping()
-    public String showCartForCustomer(@RequestParam(required = false) String error,
-                                      Principal principal, ModelMap model) {
+    public String showCartForCustomer(Principal principal, ModelMap model) {
         Cart cart = cartService.getCartByCustomerEmail(principal.getName());
         model.addAttribute("cart", cart);
-        model.addAttribute("error", error);
         return "/cart/show-cart";
     }
 
@@ -75,35 +72,66 @@ public class CartController {
         return "redirect:/books";
     }
 
-    @PatchMapping("increment-{bookId}")
-    public String incrementProduct(@PathVariable("bookId") int bookId, Principal principal,
-                                   RedirectAttributes attributes) {
-        if (customerService.authenticatedUserIsCustomer()) {
-            Cart cart = cartService.getCartByCustomerEmail(principal.getName());
-            try {
-                cartService.incrementProduct(bookId, cart);
-            } catch (SQLException e) {
-                // not good enough
-                attributes.addAttribute("error", "No more available books");
-            }
+    @PatchMapping("/increment-{bookId}")
+    @Secured("ROLE_CUSTOMER")
+    public String incrementProductForCustomer(@PathVariable("bookId") int bookId, Principal principal,
+                                              ModelMap modelMap) {
+
+        Cart cart = cartService.getCartByCustomerEmail(principal.getName());
+
+        try {
+            cartService.incrementProduct(bookId, cart);
+            return "redirect:/cart";
+        } catch (SQLException e) {
+            // not good enough
+            modelMap.addAttribute("cart", cart);
+            modelMap.addAttribute("error", "No more available books");
+            return "/cart/show-cart";
         }
+    }
+
+    @PatchMapping("/{customerId}/increment-{bookId}")
+    @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
+    public String incrementProductForManager(@PathVariable("bookId") int bookId,
+                                             @PathVariable("customerId") int customerId, ModelMap modelMap) {
+
+        Cart cart = cartService.getCartByCustomerId(customerId);
+
+        try {
+            cartService.incrementProduct(bookId, cart);
+            return "redirect:/cart/{customerId}";
+        } catch (SQLException e) {
+            // not good enough
+            modelMap.addAttribute("cart", cart);
+            modelMap.addAttribute("error", "No more available books");
+            return "/cart/show-cart";
+        }
+    }
+
+    @PatchMapping("/decrement-{bookId}")
+    @Secured("ROLE_CUSTOMER")
+    public String decrementProductForCustomer(@PathVariable("bookId") int bookId, Principal principal) {
+
+        Cart cart = cartService.getCartByCustomerEmail(principal.getName());
+        cartService.decrementProduct(bookId, cart);
         return "redirect:/cart";
     }
 
-    @PatchMapping("decrement-{bookId}")
-    public String decrementProduct(@PathVariable("bookId") int bookId, Principal principal) {
-        if (customerService.authenticatedUserIsCustomer()) {
-            Cart cart = cartService.getCartByCustomerEmail(principal.getName());
-            cartService.decrementProduct(bookId, cart);
-        }
-        return "redirect:/cart";
+    @PatchMapping("/{customerId}/decrement-{bookId}")
+    @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
+    public String decrementProductForManager(@PathVariable("bookId") int bookId,
+                                             @PathVariable("customerId") int customerId) {
+
+        Cart cart = cartService.getCartByCustomerId(customerId);
+        cartService.decrementProduct(bookId, cart);
+        return "redirect:/cart/{customerId}";
     }
 
     @DeleteMapping("/delete-{bookId}")
     @Secured("ROLE_CUSTOMER")
     public String deleteFromCartForCustomer(@PathVariable("bookId") int bookId, Principal principal) {
-            Cart cart = cartService.getCartByCustomerEmail(principal.getName());
-            cartService.deleteOrderFromCart(bookId, cart);
+        Cart cart = cartService.getCartByCustomerEmail(principal.getName());
+        cartService.deleteOrderFromCart(bookId, cart);
         return "redirect:/cart";
     }
 
