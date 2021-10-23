@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -56,8 +57,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @Transactional(rollbackFor = {SQLException.class})
-    public void addOrderToCart(Order order) throws SQLException {
+    @Transactional(rollbackFor = SQLException.class)
+    public void addToCart(Order order) throws SQLException {
         Order tempOrder = orderService.readOrderByCartIdAndProductId(order.getCartId(), order.getProductId());
 
         if (tempOrder == null) {
@@ -69,7 +70,21 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @Transactional(rollbackFor = {SQLException.class})
+    public void addToCartByCustomerId(int customerId, int bookId) throws SQLException {
+        Cart cart = getCartByCustomerId(customerId);
+        Order order = new Order(cart.getId(), bookId, 1);
+        addToCart(order);
+    }
+
+    @Override
+    public void addToCartByCustomerEmail(String email, int bookId) throws SQLException {
+        Cart cart = getCartByCustomerEmail(email);
+        Order order = new Order(cart.getId(), bookId, 1);
+        addToCart(order);
+    }
+
+    @Override
+    @Transactional(rollbackFor = SQLException.class)
     public void incrementProduct(int productId, Cart cart) throws SQLException {
 
         for (Order order : cart.getOrderList()) {
@@ -82,7 +97,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @Transactional(rollbackFor = {SQLException.class})
+    @Transactional(rollbackFor = SQLException.class)
     public void decrementProduct(int productId, Cart cart) {
 
         cart.getOrderList().forEach(order -> {
@@ -99,7 +114,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @Transactional(rollbackFor = {SQLException.class})
+    @Transactional(rollbackFor = SQLException.class)
     public void deleteOrderFromCart(int productId, Cart cart) {
         Book book = bookService.getBookById(productId);
 

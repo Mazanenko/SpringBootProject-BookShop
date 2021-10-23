@@ -13,6 +13,13 @@
 
 <div th:if="${cart == null}">Customer does not exist.</div>
 
+<div sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')" th:unless="${cart == null}">
+    <a th:href="@{/cart/{cartId}-add-book(cartId=${cart.getId()})}">
+        <button class="btn success">Add new book</button>
+    </a>
+</div>
+<br/>
+
 <div th:unless="${cart == null}" style="overflow-x:auto;">
     <div th:if="${cart.getOrderList().isEmpty()}">No orders yet.</div>
 
@@ -41,7 +48,8 @@
 
                 <td style="text-align: center">
                     <div>
-                        <form sec:authorize="hasRole('CUSTOMER')" th:method="PATCH" th:action="@{/cart/increment-{bookId}(bookId=${order.getProductId()})}">
+                        <form sec:authorize="hasRole('CUSTOMER')" th:method="PATCH"
+                              th:action="@{/cart/increment-{bookId}(bookId=${order.getProductId()})}">
                             <button>&#708;</button>
                         </form>
                         <form sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" th:method="PATCH"
@@ -51,7 +59,8 @@
 
                         <h3 th:text="${order.getQuantity()}"> quantity</h3>
 
-                        <form sec:authorize="hasRole('CUSTOMER')" th:method="PATCH" th:action="@{/cart/decrement-{bookId}(bookId=${order.getProductId()})}">
+                        <form sec:authorize="hasRole('CUSTOMER')" th:method="PATCH"
+                              th:action="@{/cart/decrement-{bookId}(bookId=${order.getProductId()})}">
                             <button>&#709;</button>
                         </form>
                         <form sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" th:method="PATCH"
@@ -59,7 +68,7 @@
                             <button>&#709;</button>
                         </form>
                     </div>
-                    </td>
+                </td>
 
                 <td>
                     <form sec:authorize="hasRole('CUSTOMER')" th:method="DELETE"
@@ -76,10 +85,15 @@
         </table>
 
         <div th:if="${error}">
-            <script>
+            <script sec:authorize="hasRole('CUSTOMER')">
                 window.alert('This is maximum quantity we have at this moment for this book!\n' +
                     'Please, come back later to buy more.');
                 window.location.href = "/cart"
+            </script>
+            <script th:inline="javascript" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+                window.alert('This is maximum quantity we have at this moment for this book!\n' +
+                    'Please, come back later to buy more.');
+                window.location.href = "/cart/" + [[${cart.getCustomerId()}]];
             </script>
         </div>
 

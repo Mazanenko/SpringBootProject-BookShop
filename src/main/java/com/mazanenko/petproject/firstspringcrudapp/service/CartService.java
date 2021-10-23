@@ -13,7 +13,11 @@ public interface CartService {
 
     Cart getCartByCustomerId(int id);
 
-    void addOrderToCart(Order order) throws SQLException;
+    void addToCart(Order order) throws SQLException;
+
+    void addToCartByCustomerId(int customerId, int bookId) throws SQLException;
+
+    void addToCartByCustomerEmail(String email, int bookId) throws SQLException;
 
     void incrementProduct(int productId, Cart cart) throws SQLException;
 

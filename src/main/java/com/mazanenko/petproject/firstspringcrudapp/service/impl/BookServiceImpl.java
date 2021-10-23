@@ -48,20 +48,24 @@ public class BookServiceImpl implements BookService {
     @Override
     public void incrementBookQuantity(int bookId) {
         Book book = getBookById(bookId);
-        int quantity = book.getAvailableQuantity();
-        book.setAvailableQuantity(++quantity);
-        updateBookById(bookId, book);
+        if (book != null) {
+            int quantity = book.getAvailableQuantity();
+            book.setAvailableQuantity(++quantity);
+            updateBookById(bookId, book);
+        }
     }
 
     @Override
     public void decrementBookQuantity(int bookId) throws SQLException {
         Book book = getBookById(bookId);
-        int quantity =book.getAvailableQuantity();
+        if (book != null) {
+            int quantity = book.getAvailableQuantity();
 
-        if (quantity >= 1) {
-            book.setAvailableQuantity(--quantity);
-            updateBookById(bookId, book);
-        } else throw new SQLException();
+            if (quantity >= 1) {
+                book.setAvailableQuantity(--quantity);
+                updateBookById(bookId, book);
+            } else throw new SQLException();
+        }
     }
 
     @Override

@@ -1,11 +1,8 @@
 package com.mazanenko.petproject.firstspringcrudapp.controller;
 
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
-import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
-import com.mazanenko.petproject.firstspringcrudapp.entity.Order;
 import com.mazanenko.petproject.firstspringcrudapp.service.BookService;
 import com.mazanenko.petproject.firstspringcrudapp.service.CartService;
-import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -21,14 +18,11 @@ import java.sql.SQLException;
 public class CartController {
     private final CartService cartService;
     private final BookService bookService;
-    private final CustomerService customerService;
 
     @Autowired
-    public CartController(CartService cartService, BookService bookService
-            , CustomerService customerService) {
+    public CartController(CartService cartService, BookService bookService) {
         this.cartService = cartService;
         this.bookService = bookService;
-        this.customerService = customerService;
     }
 
     @GetMapping("/{customerId}")
@@ -39,35 +33,46 @@ public class CartController {
     }
 
     @GetMapping()
+    @Secured("ROLE_CUSTOMER")
     public String showCartForCustomer(Principal principal, ModelMap model) {
         Cart cart = cartService.getCartByCustomerEmail(principal.getName());
         model.addAttribute("cart", cart);
         return "/cart/show-cart";
     }
 
-    //not complete
-    @PostMapping("/{id}/add")
+    @GetMapping("/{cartId}-add-book")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String addToCart(@ModelAttribute("order") Order order, @PathVariable("id") int id) {
-        return "redirect:/books";
+    public String addBookToCustomer(@PathVariable("cartId") int cartId, ModelMap model) {
+        model.addAttribute("books", bookService.getAllBooks());
+        model.addAttribute("cart", cartService.getCartById(cartId));
+        return "/books/list";
     }
 
+    @PostMapping("/{customerId}/add-{bookId}")
+    @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
+    public String addToCartForManager(@PathVariable("bookId") int bookId,
+                                      @PathVariable("customerId") int customerId) {
+
+        try {
+            cartService.addToCartByCustomerId(customerId, bookId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return String.format("redirect:/cart/%s", customerId);
+    }
+
+
     @PostMapping("/add-{bookId}")
+    @Secured("ROLE_CUSTOMER")
     public String addToCartForCustomer(@PathVariable("bookId") int bookId, Principal principal) {
 
-        if (customerService.authenticatedUserIsCustomer()) {
-            Customer customer = customerService.getCustomerByEmail(principal.getName());
-            int cartId = customer.getCart().getId();
-            Order order = new Order(cartId, bookId, 1);
-
-            if (bookService.isBookAvailable(order.getProductId())) {
-                try {
-                    cartService.addOrderToCart(order);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                return "redirect:/cart";
+        if (bookService.isBookAvailable(bookId)) {
+            try {
+                cartService.addToCartByCustomerEmail(principal.getName(), bookId);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
+            return "redirect:/cart";
         }
         return "redirect:/books";
     }
@@ -83,7 +88,7 @@ public class CartController {
             cartService.incrementProduct(bookId, cart);
             return "redirect:/cart";
         } catch (SQLException e) {
-            // not good enough
+            // not good enough. Need to change alert in view to sth else
             modelMap.addAttribute("cart", cart);
             modelMap.addAttribute("error", "No more available books");
             return "/cart/show-cart";
@@ -101,7 +106,7 @@ public class CartController {
             cartService.incrementProduct(bookId, cart);
             return "redirect:/cart/{customerId}";
         } catch (SQLException e) {
-            // not good enough
+            // not good enough. Need to change alert in view to sth else
             modelMap.addAttribute("cart", cart);
             modelMap.addAttribute("error", "No more available books");
             return "/cart/show-cart";
