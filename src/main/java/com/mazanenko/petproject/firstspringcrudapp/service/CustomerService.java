@@ -1,9 +1,11 @@
 package com.mazanenko.petproject.firstspringcrudapp.service;
 
+import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.List;
 
 public interface CustomerService {
@@ -28,4 +30,6 @@ public interface CustomerService {
     boolean isAuthenticated();
 
     boolean activateUser(String code);
+
+    boolean isSubscribedToArrival(Principal principal, Book book);
 }

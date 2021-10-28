@@ -3,6 +3,7 @@ package com.mazanenko.petproject.firstspringcrudapp.entity;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.List;
 
 public abstract class Product {
 
@@ -19,6 +20,8 @@ public abstract class Product {
 
     @PositiveOrZero(message = "Should be positive or zero")
     private int availableQuantity;
+
+    private List<Integer> subscribersList;
 
 
     public Product() {
@@ -70,6 +73,14 @@ public abstract class Product {
 
     public void setAvailableQuantity(int availableQuantity) {
         this.availableQuantity = availableQuantity;
+    }
+
+    public List<Integer> getSubscribersList() {
+        return subscribersList;
+    }
+
+    public void setSubscribersList(List<Integer> subscribersList) {
+        this.subscribersList = subscribersList;
     }
 
     @Override

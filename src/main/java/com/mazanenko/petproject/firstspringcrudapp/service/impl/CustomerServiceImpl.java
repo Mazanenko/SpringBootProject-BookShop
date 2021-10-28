@@ -3,6 +3,7 @@ package com.mazanenko.petproject.firstspringcrudapp.service.impl;
 import com.mazanenko.petproject.firstspringcrudapp.dao.CartDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.CustomerDAO;
 import com.mazanenko.petproject.firstspringcrudapp.dao.DeliveryAddressDAO;
+import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
@@ -18,6 +19,7 @@ import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -147,5 +149,11 @@ public class CustomerServiceImpl implements CustomerService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean isSubscribedToArrival(Principal principal, Book book) {
+        Customer customer = getCustomerByEmail(principal.getName());
+        return book.getSubscribersList()!=null && book.getSubscribersList().contains(customer.getId());
     }
 }

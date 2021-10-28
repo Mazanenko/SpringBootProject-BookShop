@@ -1,7 +1,7 @@
 package com.mazanenko.petproject.firstspringcrudapp.entity;
 
 
-public class Manager extends Person {
+public final class Manager extends Person {
 
     public Manager() {
     }
