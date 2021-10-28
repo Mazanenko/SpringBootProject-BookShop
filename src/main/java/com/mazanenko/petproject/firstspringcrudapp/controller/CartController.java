@@ -150,4 +150,13 @@ public class CartController {
         return "redirect:/cart/{customerId}";
     }
 
+
+    @PatchMapping("/order")
+    @Secured("ROLE_CUSTOMER")
+    public String makeAnOrder(Principal principal) {
+
+        cartService.makeAnOrderByCustomerEmail(principal.getName());
+        return "redirect:/";
+    }
+
 }

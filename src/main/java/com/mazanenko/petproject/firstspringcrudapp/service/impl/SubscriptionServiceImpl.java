@@ -2,7 +2,7 @@ package com.mazanenko.petproject.firstspringcrudapp.service.impl;
 
 import com.mazanenko.petproject.firstspringcrudapp.dao.SubscriptionDAO;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
-import com.mazanenko.petproject.firstspringcrudapp.entity.CustomerSubscriptionEvent;
+import com.mazanenko.petproject.firstspringcrudapp.entity.event.CustomerSubscriptionEvent;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Subscription;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
 import com.mazanenko.petproject.firstspringcrudapp.service.SubscriptionService;

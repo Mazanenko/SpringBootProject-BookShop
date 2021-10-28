@@ -40,7 +40,10 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public List<Manager> getAllManagers() {
-        return managerDAO.readAll().stream().sorted(Comparator.comparing(Manager::getId)).collect(Collectors.toList());
+        List<Manager> list = managerDAO.readAll().stream().sorted(Comparator.comparing(Manager::getId))
+                .collect(Collectors.toList());
+        list.removeIf(manager -> manager.getEmail().equals("admin"));
+        return list;
     }
 
     @Override

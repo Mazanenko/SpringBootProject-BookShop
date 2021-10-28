@@ -1,4 +1,6 @@
-package com.mazanenko.petproject.firstspringcrudapp.entity;
+package com.mazanenko.petproject.firstspringcrudapp.entity.event;
+
+import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
 
 public class ProductArrivalEvent {
     private final Book book;

@@ -7,9 +7,10 @@ import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.DeliveryAddress;
+import com.mazanenko.petproject.firstspringcrudapp.entity.event.CustomerRegistrationEvent;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
-import com.mazanenko.petproject.firstspringcrudapp.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,15 +32,15 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerDAO customerDAO;
     private final DeliveryAddressDAO addressDAO;
     private final CartDAO cartDAO;
-    private final EmailService emailService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
     public CustomerServiceImpl(CustomerDAO customerDAO, DeliveryAddressDAO addressDAO, CartDAO cartDAO
-            , EmailService emailService) {
+            , ApplicationEventPublisher applicationEventPublisher) {
         this.customerDAO = customerDAO;
         this.addressDAO = addressDAO;
         this.cartDAO = cartDAO;
-        this.emailService = emailService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -61,10 +62,7 @@ public class CustomerServiceImpl implements CustomerService {
         cartDAO.create(cart);
 
         if (!StringUtils.isEmpty(customer.getEmail())) {
-            String message = String.format("Hello, %s! \n" + "Welcome to Booksland! Please, visit next link: " +
-                            "http://localhost:8080/customer/activate/%s to activate your account and complete registration."
-                    , customer.getName(), customer.getActivationCode());
-            emailService.sendSimpleMessage(customer.getEmail(), "Registration on booksland", message);
+            publishRegistrationEvent(customer.getEmail());
         }
     }
 
@@ -155,5 +153,9 @@ public class CustomerServiceImpl implements CustomerService {
     public boolean isSubscribedToArrival(Principal principal, Book book) {
         Customer customer = getCustomerByEmail(principal.getName());
         return book.getSubscribersList()!=null && book.getSubscribersList().contains(customer.getId());
+    }
+
+    private void publishRegistrationEvent(String email) {
+        applicationEventPublisher.publishEvent(new CustomerRegistrationEvent(email));
     }
 }

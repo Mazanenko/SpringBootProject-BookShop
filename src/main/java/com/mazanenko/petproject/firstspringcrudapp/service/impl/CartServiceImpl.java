@@ -5,11 +5,13 @@ import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Order;
+import com.mazanenko.petproject.firstspringcrudapp.entity.event.OrderEvent;
 import com.mazanenko.petproject.firstspringcrudapp.service.BookService;
 import com.mazanenko.petproject.firstspringcrudapp.service.CartService;
 import com.mazanenko.petproject.firstspringcrudapp.service.CustomerService;
 import com.mazanenko.petproject.firstspringcrudapp.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +24,16 @@ public class CartServiceImpl implements CartService {
     private final OrderService orderService;
     private final CustomerService customerService;
     private final BookService bookService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    public CartServiceImpl(CartDAO cartDAO, OrderService orderService, CustomerService customerService, BookService bookService) {
+    public CartServiceImpl(CartDAO cartDAO, OrderService orderService, CustomerService customerService,
+                           BookService bookService, ApplicationEventPublisher applicationEventPublisher) {
         this.cartDAO = cartDAO;
         this.orderService = orderService;
         this.customerService = customerService;
         this.bookService = bookService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -130,5 +135,19 @@ public class CartServiceImpl implements CartService {
     @Override
     public void deleteAllOrdersFromCart(int cartId) {
         orderService.deleteAllOrdersByCartId(cartId);
+    }
+
+    @Override
+    public void makeAnOrderByCustomerEmail(String email) {
+        Cart cart = getCartByCustomerEmail(email);
+
+        deleteAllOrdersFromCart(cart.getId());
+
+        new Thread(() -> publishOrderEvent(cart)).start();
+    }
+
+
+    private void publishOrderEvent(Cart cart) {
+        applicationEventPublisher.publishEvent(new OrderEvent(cart));
     }
 }

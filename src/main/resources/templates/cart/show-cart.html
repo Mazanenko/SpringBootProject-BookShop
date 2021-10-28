@@ -83,6 +83,12 @@
             </tr>
             </tbody>
         </table>
+        <br/>
+        <div name="make-an-order-btn" sec:authorize="hasRole('CUSTOMER')">
+            <form th:method="PATCH" th:action="@{/cart/order}">
+                <button style="padding:  10px 20px;" class="btn success">Make an order</button>
+            </form>
+        </div>
 
         <div th:if="${error}">
             <script sec:authorize="hasRole('CUSTOMER')">

@@ -1,4 +1,4 @@
-package com.mazanenko.petproject.firstspringcrudapp.entity;
+package com.mazanenko.petproject.firstspringcrudapp.entity.event;
 
 public class CustomerSubscriptionEvent {
     private final String name;

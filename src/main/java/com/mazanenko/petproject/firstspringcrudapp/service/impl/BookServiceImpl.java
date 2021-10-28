@@ -2,7 +2,7 @@ package com.mazanenko.petproject.firstspringcrudapp.service.impl;
 
 import com.mazanenko.petproject.firstspringcrudapp.dao.BookDAO;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
-import com.mazanenko.petproject.firstspringcrudapp.entity.ProductArrivalEvent;
+import com.mazanenko.petproject.firstspringcrudapp.entity.event.ProductArrivalEvent;
 import com.mazanenko.petproject.firstspringcrudapp.service.BookService;
 import com.mazanenko.petproject.firstspringcrudapp.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;

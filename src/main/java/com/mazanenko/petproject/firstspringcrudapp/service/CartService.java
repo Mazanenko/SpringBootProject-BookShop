@@ -28,4 +28,6 @@ public interface CartService {
     void deleteOrderFromCart(int productId, Cart cart);
 
     void deleteAllOrdersFromCart(int cartId);
+
+    void makeAnOrderByCustomerEmail(String email);
 }
