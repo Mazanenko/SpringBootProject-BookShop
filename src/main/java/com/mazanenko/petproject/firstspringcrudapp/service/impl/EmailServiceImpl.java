@@ -4,6 +4,7 @@ import com.mazanenko.petproject.firstspringcrudapp.dao.BookDAO;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Book;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Cart;
 import com.mazanenko.petproject.firstspringcrudapp.entity.Customer;
+import com.mazanenko.petproject.firstspringcrudapp.entity.Manager;
 import com.mazanenko.petproject.firstspringcrudapp.entity.event.CustomerRegistrationEvent;
 import com.mazanenko.petproject.firstspringcrudapp.entity.event.CustomerSubscriptionEvent;
 import com.mazanenko.petproject.firstspringcrudapp.entity.event.OrderEvent;
@@ -56,6 +57,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @EventListener
+    @Override
     public void handleCustomerRegistrationEvent(CustomerRegistrationEvent event) {
         Customer customer = customerService.getCustomerByEmail(event.getCustomerEmail());
 
@@ -68,6 +70,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @EventListener
+    @Override
     public void handleSubscriptionEvent(CustomerSubscriptionEvent event) {
         Book book = bookDAO.read(event.getProductId());
 
@@ -89,6 +92,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @EventListener
+    @Override
     public void handleArrivalEvent(ProductArrivalEvent event) {
         List<Integer> subscribersList = event.getBook().getSubscribersList();
 
@@ -100,16 +104,17 @@ public class EmailServiceImpl implements EmailService {
         });
     }
 
-
     @Async
     @EventListener
+    @Override
     public void handleOrderEvent(OrderEvent event) {
         AtomicInteger i = new AtomicInteger();
         Cart cart = event.getCart();
         Customer customer = customerService.getCustomerById(cart.getCustomerId());
         List<String> list = new ArrayList<>();
+        List<Manager> managerList = managerService.getAllManagers();
 
-        cart.getOrderList().forEach(order -> list.add(i.incrementAndGet() + " " + order.getBook().getName() + " by " +
+        cart.getOrderList().forEach(order -> list.add(i.incrementAndGet() + ". " + order.getBook().getName() + " by " +
                 order.getBook().getAuthor() + " - " + order.getQuantity() + " pc."));
 
         String messageForCustomer = "Hi! Your order: \n" + StringUtils.join(list, '\n') +
@@ -133,8 +138,9 @@ public class EmailServiceImpl implements EmailService {
         sendSimpleMessage(customer.getEmail(), "The order at Booksland", messageForCustomer);
 
         // sending message to managers
-        managerService.getAllManagers().forEach(manager -> sendSimpleMessage(manager.getEmail(),
-                "Alarm! New order.", messageForManager));
-
+        if(managerList != null) {
+            managerList.forEach(manager -> sendSimpleMessage(manager.getEmail(),
+                    "Alarm! New order.", messageForManager));
+        }
     }
 }

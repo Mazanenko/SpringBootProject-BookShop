@@ -1,0 +1,41 @@
+INSERT INTO book (name, author, genre, description, available_quantity, price, photo_url)
+VALUES ('White Fang', 'Jack London', 'Novel',
+        'The story details White Fang''s journey to domestication in Yukon Territory and the Northwest Territories during the 1890s Klondike Gold Rush.',
+        100, 8, 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/JackLondonwhitefang1.jpg/272px-JackLondonwhitefang1.jpg'),
+       ('The Sea-Wolf', 'Jack London', 'Novel',
+        'The book''s protagonist, Humphrey Van Weyden, is a literary critic who is a survivor of an ocean collision and who comes under the dominance of Wolf Larsen, the powerful and amoral sea captain who rescues him.',
+        100, 10, 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Sea-wolf_cover.jpg/274px-Sea-wolf_cover.jpg'),
+       ('The Call of the Wild', 'Jack London', 'Novel',
+        'The story about a dog named Buck', 100, 9, 'https://upload.wikimedia.org/wikipedia/commons/2/26/JackLondoncallwild.jpg'),
+       ('To Kill a Mockingbird', 'Harper Lee', 'Southern Gothic',
+        'The protagonist is Jean Louise Finch, an intelligent though unconventional girl who ages from six to nine years old during the course of the novel.',
+        100, 10, 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/To_Kill_a_Mockingbird_%28first_edition_cover%29.jpg/485px-To_Kill_a_Mockingbird_%28first_edition_cover%29.jpg'),
+       ('The Old Man and the Sea', 'Ernest Hemingway', 'Literary Fiction', 'Greatest book of all time, as all books by Ernest Hemingway.',
+        1000000, 1, 'https://upload.wikimedia.org/wikipedia/en/7/73/Oldmansea.jpg'),
+       ('A Moveable Feast', 'Ernest Hemingway', 'Memoir',
+        'The memoir by Hemingway about his years as a struggling expat journalist and writer in Paris during the 1920s.',
+        500, 8, 'https://upload.wikimedia.org/wikipedia/en/thumb/a/aa/MoveableFeast.jpg/220px-MoveableFeast.jpg'),
+       ('Under Kilimanjaro', 'Ernest Hemingway', 'Novel',
+        'The novel is based upon journals that Hemingway wrote while he was on his last safari. It is a longer and re-edited version of True at First Light.',
+        500, 7, 'https://upload.wikimedia.org/wikipedia/en/thumb/9/93/UnderKilamanjaro.jpg/220px-UnderKilamanjaro.jpg'),
+       ('Islands in the Stream', 'Ernest Hemingway', 'Novel',
+        'Beginning in the 1930s, Islands in the Stream follows the fortunes of Thomas Hudson, from his experiences as a painter on the Gulf Stream island of Bimini through his antisubmarine activities off the coast of Cuba during World War II.',
+        500, 8, 'https://upload.wikimedia.org/wikipedia/en/thumb/2/22/IslandsInTheStream.jpg/220px-IslandsInTheStream.jpg'),
+       ('The Doomed City', 'Arkady and Boris Strugatsky', 'Novel',
+        'The novel is set in a mysterious world where enigmatic Mentors run a sociological experiment.', 1000000, 1,
+        'https://data.fantlab.ru/images/editions/orig/222510?r=1523534923'),
+       ('Snail on the Slope', 'Arkady and Boris Strugatsky', 'Novel',
+        'Another greatest book by great authors.', 1000000, 1,
+        'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1390080563l/1535134.jpg'),
+       ('Roadside Picnic', 'Arkady and Boris Strugatsky', 'Novel',
+        'This great book no needs a description', 1000000, 1,
+        'https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Roadside-picnic-macmillan-cover.jpg/220px-Roadside-picnic-macmillan-cover.jpg'),
+       ('Brave New World', 'Aldous Huxley', 'Dystopian fiction',
+        'The novel examines a futuristic society, called the World State, that revolves around science and efficiency. In this society, emotions and individuality are conditioned out of children at a young age, and there are no lasting relationships because “every one belongs to every one else” (a common World State dictum).',
+        500, 7, 'https://upload.wikimedia.org/wikipedia/en/thumb/6/62/BraveNewWorld_FirstEdition.jpg/220px-BraveNewWorld_FirstEdition.jpg');
+
+INSERT INTO manager (name, surname, email, password)
+VALUES ('admin', 'admin', 'admin', '$2a$12$AxyQRTrjj0RCTHV55bOTY.X/zpX0R2kYE1noIqUmLo1m/MHUXRnKi'),
+       ('Manager', 'Manager', 'manager@booksland.shop', '$2a$10$.XHPTYxhJZd6edSaGZ5Wdu7OXcS5/zZVDB61FqqdLiOU/xzgR1/6u');
+
+
