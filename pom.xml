@@ -11,7 +11,7 @@
     <groupId>com.mazanenko.pet-project</groupId>
     <artifactId>firstSpringCRUDApp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>firstSpringCRUDApp</name>
     <description>firstSpringCRUDApp</description>
     <properties>
