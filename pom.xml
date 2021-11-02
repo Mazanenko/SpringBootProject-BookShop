@@ -9,11 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.mazanenko.pet-project</groupId>
-    <artifactId>firstSpringCRUDApp</artifactId>
+    <artifactId>bookshop</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>firstSpringCRUDApp</name>
-    <description>firstSpringCRUDApp</description>
+    <name>bookshop</name>
+    <description>bookshop</description>
     <properties>
         <java.version>11</java.version>
     </properties>
