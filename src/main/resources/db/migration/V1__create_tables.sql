@@ -18,7 +18,7 @@ CREATE TABLE customer
     name            varchar(50)  NOT NULL,
     surname         varchar(100) NOT NULL,
     phone           varchar(20),
-    email           varchar(150) NOT NULL UNIQUE,
+    email           varchar(150) NOT NULL CONSTRAINT unique_email UNIQUE,
     gender          varchar(6)   NOT NULL,
     password        varchar(200) NOT NULL,
     activated       varchar(5) DEFAULT 'false',
