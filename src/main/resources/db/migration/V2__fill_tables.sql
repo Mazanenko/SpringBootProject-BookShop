@@ -36,6 +36,6 @@ VALUES ('White Fang', 'Jack London', 'Novel',
 
 INSERT INTO manager (name, surname, email, password)
 VALUES ('admin', 'admin', 'admin', '$2a$12$AxyQRTrjj0RCTHV55bOTY.X/zpX0R2kYE1noIqUmLo1m/MHUXRnKi'),
-       ('Manager', 'Manager', 'manager@booksland.shop', '$2a$10$.XHPTYxhJZd6edSaGZ5Wdu7OXcS5/zZVDB61FqqdLiOU/xzgR1/6u');
+       ('John', 'Smith', 'manager_smith.j@booksland.shop', '$2a$12$gfT6AfFB7m5PYHRJ.spfKO5VVjzDbOaqVJRT94FQ2u97z9rsrL6Hm');
 
 
