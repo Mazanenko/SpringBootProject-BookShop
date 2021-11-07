@@ -4,7 +4,6 @@ import com.mazanenko.petproject.bookshop.entity.Book;
 import com.mazanenko.petproject.bookshop.entity.Customer;
 import com.mazanenko.petproject.bookshop.entity.DeliveryAddress;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 
@@ -22,8 +21,6 @@ public interface CustomerService {
     void deleteCustomerById(int id);
 
     void deleteCustomerByEmail(String email);
-
-    void authWithHttpServletRequest(HttpServletRequest request, String username, String password);
 
     boolean authenticatedUserIsCustomer();
 

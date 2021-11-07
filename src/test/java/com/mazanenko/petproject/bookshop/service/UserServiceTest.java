@@ -3,6 +3,7 @@ package com.mazanenko.petproject.bookshop.service;
 import com.mazanenko.petproject.bookshop.entity.Customer;
 import com.mazanenko.petproject.bookshop.entity.Manager;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +24,18 @@ class UserServiceTest {
     @MockBean
     private ManagerService managerService;
 
+    Customer customer = new Customer();
+    Manager manager = new Manager();
+    String email = "test@mail.ru";
+
+    @BeforeEach
+    public void setUp() {
+        customer.setEmail(email);
+        manager.setEmail(email);
+    }
 
     @Test
     public void findByEmailShouldReturnCustomer() {
-        Customer customer = new Customer();
-        String email = "test@mail.ru";
-
-        customer.setEmail(email);
         customer.setActivated(true);
 
         Mockito.doReturn(customer).when(customerService).getCustomerByEmail(email);
@@ -38,20 +44,14 @@ class UserServiceTest {
 
     @Test
     public void findByEmailShouldReturnManager() {
-        Manager manager = new Manager();
-        String email = "test@mail.com";
-
-        manager.setEmail(email);
-
         Mockito.doReturn(manager).when(managerService).getManagerByEmail(email);
         Assertions.assertEquals(userService.findByEmail(email).getEmail(), email);
     }
 
     @Test
     public void findByEmailShouldThrowUsernameNotFoundExceptionForCustomer() {
-        String email = "test@mail.com";
         Exception exception = Assertions.assertThrows(UsernameNotFoundException.class, () -> {
-            Mockito.doReturn(new Customer()).when(customerService).getCustomerByEmail(email);
+            Mockito.doReturn(customer).when(customerService).getCustomerByEmail(email);
             userService.findByEmail(email);
         });
 
@@ -63,7 +63,6 @@ class UserServiceTest {
 
     @Test
     public void findByEmailShouldThrowUsernameNotFoundExceptionForManager() {
-        String email = "test@mail.com";
         Exception exception = Assertions.assertThrows(UsernameNotFoundException.class, () -> {
             Mockito.doReturn(null).when(managerService).getManagerByEmail(email);
             userService.findByEmail(email);

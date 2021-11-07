@@ -18,8 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.Comparator;
 import java.util.List;
@@ -29,10 +27,12 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    private final CustomerDAO customerDAO;
-    private final DeliveryAddressDAO addressDAO;
-    private final CartDAO cartDAO;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private CustomerDAO customerDAO;
+    private DeliveryAddressDAO addressDAO;
+    private CartDAO cartDAO;
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    public CustomerServiceImpl() {}
 
     @Autowired
     public CustomerServiceImpl(CustomerDAO customerDAO, DeliveryAddressDAO addressDAO, CartDAO cartDAO
@@ -45,24 +45,25 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void createCustomer(Customer customer, DeliveryAddress address) {
+        if (customer != null) {
+            String cryptedPassword = BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt());
+            customer.setPassword(cryptedPassword);
+            customer.setActivationCode(UUID.randomUUID().toString());
+            customerDAO.create(customer);
 
-        String cryptedPassword = BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt());
-        customer.setPassword(cryptedPassword);
-        customer.setActivationCode(UUID.randomUUID().toString());
-        customerDAO.create(customer);
+            Customer tempCustomer = customerDAO.readByEmail(customer.getEmail());
+            address.setCustomerId(tempCustomer.getId());
 
-        Customer tempCustomer = customerDAO.readByEmail(customer.getEmail());
-        address.setCustomerId(tempCustomer.getId());
+            addressDAO.create(address);
 
-        addressDAO.create(address);
+            Cart cart = new Cart();
+            cart.setCustomerId(tempCustomer.getId());
+            customer.setCart(cart);
+            cartDAO.create(cart);
 
-        Cart cart = new Cart();
-        cart.setCustomerId(tempCustomer.getId());
-        customer.setCart(cart);
-        cartDAO.create(cart);
-
-        if (!StringUtils.isEmpty(customer.getEmail())) {
-            publishRegistrationEvent(customer.getEmail());
+            if (!StringUtils.isEmpty(customer.getEmail())) {
+                publishRegistrationEvent(customer.getEmail());
+            }
         }
     }
 
@@ -105,21 +106,15 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteCustomerById(int id) {
-        customerDAO.delete(id);
+        if (id > 0) {
+            customerDAO.delete(id);
+        }
     }
 
     @Override
     public void deleteCustomerByEmail(String email) {
-        customerDAO.deleteByEmail(email);
-    }
-
-    @Override
-    public void authWithHttpServletRequest(HttpServletRequest request, String username, String password) {
-        try {
-            request.login(username, password);
-        } catch (ServletException e) {
-            System.out.println("error while login" + e.getMessage());
-            e.printStackTrace();
+        if (email != null) {
+            customerDAO.deleteByEmail(email);
         }
     }
 
