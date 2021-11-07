@@ -1,7 +1,7 @@
 # Booksland.shop
 
 ----
-##___Description:___
+## Description:
 This is a bookshop site.
 
 It is provides 4 level access for customer, manager and admin:
@@ -20,13 +20,13 @@ This app based on:
 - Docker
 
 
-##___Install this before running the app:___
+## ___Install this before running the app:___
 * Git
 * Maven
 * Docker
 * Docker Compose
 
-##___Run app:___
+## ___Run app:___
 1. Pull this repo ```git pull https://github.com/Mazanenko/SpringBootProject-BookShop.git```
 2. To enable mail sender, you have to add mail server properties in [application.properties](./src/main/resources/application.properties).
 If you don't do this, customers can't activate their accounts. Also, customers and managers 
