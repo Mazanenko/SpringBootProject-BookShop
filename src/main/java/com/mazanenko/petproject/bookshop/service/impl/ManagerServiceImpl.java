@@ -14,7 +14,10 @@ import java.util.stream.Collectors;
 @Service
 public class ManagerServiceImpl implements ManagerService {
 
-    private final ManagerDAO managerDAO;
+    private ManagerDAO managerDAO;
+
+    public ManagerServiceImpl() {
+    }
 
     @Autowired
     public ManagerServiceImpl(ManagerDAO managerDAO) {
@@ -23,18 +26,26 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public void createManager(Manager manager) {
-        String cryptedPassword = BCrypt.hashpw(manager.getPassword(), BCrypt.gensalt());
-        manager.setPassword(cryptedPassword);
-        managerDAO.create(manager);
+        if(manager != null) {
+            String cryptedPassword = BCrypt.hashpw(manager.getPassword(), BCrypt.gensalt());
+            manager.setPassword(cryptedPassword);
+            managerDAO.create(manager);
+        }
     }
 
     @Override
     public Manager getManagerById(int id) {
+        if (id <= 0) {
+            return null;
+        }
         return managerDAO.read(id);
     }
 
     @Override
     public Manager getManagerByEmail(String email) {
+        if(email == null) {
+            return null;
+        }
         return managerDAO.readByEmail(email);
     }
 

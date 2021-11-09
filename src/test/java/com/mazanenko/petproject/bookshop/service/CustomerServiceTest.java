@@ -86,7 +86,7 @@ class CustomerServiceTest {
     void getCustomerByIdShouldReturnCustomer() {
         Mockito.doReturn(customer).when(customerDAO).read(id);
 
-        Assertions.assertEquals(customerService.getCustomerById(customer.getId()), customer);
+        Assertions.assertEquals(customer, customerService.getCustomerById(customer.getId()));
 
         Mockito.verify(addressDAO, Mockito.times(1)).read(id);
         Mockito.verify(cartDAO, Mockito.times(1)).readByCustomerId(id);
@@ -106,7 +106,7 @@ class CustomerServiceTest {
     void getCustomerByEmailShouldReturnCustomer() {
         Mockito.doReturn(customer).when(customerDAO).readByEmail(email);
 
-        Assertions.assertEquals(customerService.getCustomerByEmail(customer.getEmail()), customer);
+        Assertions.assertEquals(customer, customerService.getCustomerByEmail(customer.getEmail()));
 
         Mockito.verify(addressDAO, Mockito.times(1)).read(id);
         Mockito.verify(cartDAO, Mockito.times(1)).readByCustomerId(id);
@@ -136,7 +136,7 @@ class CustomerServiceTest {
 
         Mockito.doReturn(customers).when(customerDAO).readAll();
 
-        Assertions.assertEquals(customerService.getAllCustomers(), sortedList);
+        Assertions.assertEquals(sortedList, customerService.getAllCustomers());
     }
 
     @Test
