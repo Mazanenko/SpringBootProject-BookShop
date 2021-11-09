@@ -4,7 +4,7 @@
 ## Description:
 This is a bookshop site.
 
-It is provides 4 level access for customer, manager and admin:
+It is provides 4 level access for guest, customer, manager and admin:
 - ***Guest*** can only view the list of books.
 - ***Customer*** can choose a book, add it to cart, make an order, subscribe to new book arrivals, 
 edit his profile, delete his account.
