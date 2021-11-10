@@ -2,26 +2,28 @@ package com.mazanenko.petproject.bookshop.service;
 
 import com.mazanenko.petproject.bookshop.entity.Customer;
 import com.mazanenko.petproject.bookshop.entity.Manager;
+import com.mazanenko.petproject.bookshop.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @Autowired
-    private UserService userService;
+    @InjectMocks
+    private UserService userService = new UserServiceImpl();
 
-    @MockBean
+    @Mock
     private CustomerService customerService;
 
-    @MockBean
+    @Mock
     private ManagerService managerService;
 
     Customer customer = new Customer();

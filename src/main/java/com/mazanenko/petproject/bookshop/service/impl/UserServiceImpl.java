@@ -19,8 +19,11 @@ import java.util.Collection;
 
 @Service
 public class UserServiceImpl implements com.mazanenko.petproject.bookshop.service.UserService {
-    private final CustomerService customerService;
-    private final ManagerService managerService;
+    private CustomerService customerService;
+    private ManagerService managerService;
+
+    public UserServiceImpl() {
+    }
 
     @Autowired
     public UserServiceImpl(CustomerService customerService, ManagerService managerService) {

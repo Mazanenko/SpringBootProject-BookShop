@@ -4,7 +4,7 @@
 ## Description:
 This is a bookshop site.
 
-It is provides 4 level access for guest, customer, manager and admin:
+It provides four levels of access for guest, customer, manager and admin:
 - ***Guest*** can only view the list of books.
 - ***Customer*** can choose a book, add it to cart, make an order, subscribe to new book arrivals, 
 edit his profile, delete his account.
@@ -14,10 +14,14 @@ edit his profile, delete his account.
 This app based on:
 - java 11
 - spring-boot 2.5.4
+- spring security
+- thymeleaf
 - postgreSQL
 - Flyway
 - Thymeleaf
 - Docker
+- JUnit 5
+- Mockito
 
 
 ## ___Install this before running the app:___
