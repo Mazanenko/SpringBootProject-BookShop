@@ -32,38 +32,11 @@
             <input type="text" th:field="*{surname}" id="surname"/>
             <div style="color: red" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}">surname error</div>
             <br/>
-            <label for="email">Email: </label>
-            <input type="text" th:field="*{email}" id="email"/>
-            <div style="color: red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">email error</div>
-            <br/>
-            <div style="color: red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">password error</div>
-            <label for="password">Password: </label>
-            <input type="password" th:field="*{password}" id="password" onkeyup='check();'/>
-
-            <label for="confirm_password">Confirm password: </label>
-            <input type="password" id="confirm_password" onkeyup='check();'/>
-            <span id='message'></span>
         </div>
         <br/>
-        <input type="submit" value="Next" id="submit" disabled="disabled">
+        <input type="submit" id="submit">
     </form>
 </div>
 
-<script>
-    function check() {
-        var pass = document.getElementById('password');
-        var rPass = document.getElementById('confirm_password');
-
-        if (pass.value == rPass.value) {
-            document.getElementById('message').style.color = 'green';
-            document.getElementById('message').innerHTML = 'matching';
-            document.getElementById('submit').disabled = false;
-        } else {
-            document.getElementById('message').style.color = 'red';
-            document.getElementById('message').innerHTML = 'Passwords not matched';
-            document.getElementById('submit').disabled = true;
-        }
-    }
-</script>
 </body>
 </html>

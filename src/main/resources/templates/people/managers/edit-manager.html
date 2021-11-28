@@ -25,10 +25,6 @@
             <input type="text" th:field="*{surname}" id="surname"/>
             <div style="color: red" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}">surname error</div>
             <br/>
-            <label for="email">Email: </label>
-            <input type="text" th:field="*{email}" id="email"/>
-            <div style="color: red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">email error</div>
-            <br/>
             <div style="color: red" th:if="${#fields.hasErrors('password')}">Password error</div>
             <button type="button" id="pass_change_btn" onclick="changePass()">Change password</button>
             <br/>

@@ -3,12 +3,10 @@ package com.mazanenko.petproject.bookshop.controller;
 import com.mazanenko.petproject.bookshop.entity.Manager;
 import com.mazanenko.petproject.bookshop.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -46,27 +44,27 @@ public class ManagerController {
 
 
     @GetMapping("/new")
+    @Secured("ROLE_ADMIN")
     public String newManager(Model model) {
         model.addAttribute("manager", new Manager());
         return "/people/managers/new-manager";
     }
 
     @PostMapping
-    public String createManager(@ModelAttribute("manager") @Valid Manager manager, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+    @Secured("ROLE_ADMIN")
+    public String createManager(@ModelAttribute("manager") @Valid Manager manager, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors() && !bindingResult.hasFieldErrors("password")) {
             return "/people/managers/new-manager";
         } else {
             try {
-                managerService.createManager(manager);
-            } catch (DataAccessException e) {
-                if (e.getCause().getMessage().contains("email_unique")) {
-                    bindingResult.addError(new FieldError("manager", "email"
-                            , manager.getEmail() + " already registered! Please, input new one."));
-                }
-                return "/people/managers/new-manager";
+                String credentials = managerService.createManager(manager);
+                model.addAttribute("message", credentials);
+            } catch (Exception e) {
+                model.addAttribute("message", e.getMessage());
+                return "/people/managers/new-manager-status";
             }
         }
-        return "redirect:/manager";
+        return "/people/managers/new-manager-status";
     }
 
 
@@ -78,28 +76,31 @@ public class ManagerController {
 
     @PatchMapping("/{id}")
     public String updateManager(@ModelAttribute("manager") @Valid Manager manager, BindingResult bindingResult
-            , @PathVariable("id") int id) {
+            , @PathVariable("id") int id, Model model) {
 
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors() && !bindingResult.hasFieldErrors("email")) {
+            System.out.println(bindingResult.getAllErrors());
             return "/people/managers/edit-manager";
         } else {
             try {
+                manager.setEmail(managerService.getManagerById(id).getEmail());
                 managerService.updateManagerById(id, manager);
-            } catch (DataAccessException e) {
-
-                if (e.getCause().getMessage().contains("email_unique")) {
-                    bindingResult.addError(new FieldError("manager", "email"
-                            , manager.getEmail() + " already registered! Please, input new one."));
-                }
-                return "/people/managers/edit-manager";
+            } catch (Exception e) {
+                model.addAttribute("message", e.getMessage());
+                return "/people/managers/new-manager-status";
             }
         }
         return "redirect:/manager";
     }
 
     @DeleteMapping("/{id}")
-    public String deleteManager(@PathVariable("id") int id) {
-        managerService.deleteManagerById(id);
+    public String deleteManager(@PathVariable("id") int id, Model model) {
+        try {
+            managerService.deleteManagerById(id);
+        } catch (Exception e) {
+            model.addAttribute("message", e.getMessage());
+            return "/people/managers/new-manager-status";
+        }
         return "redirect:/manager";
     }
 }

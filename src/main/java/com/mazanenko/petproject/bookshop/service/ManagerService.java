@@ -6,7 +6,7 @@ import com.mazanenko.petproject.bookshop.entity.Manager;
 import java.util.List;
 
 public interface ManagerService {
-    void createManager(Manager manager);
+    String createManager(Manager manager) throws Exception;
 
     Manager getManagerById(int id);
 
@@ -14,7 +14,7 @@ public interface ManagerService {
 
     List<Manager> getAllManagers();
 
-    void updateManagerById(int id, Manager manager);
+    void updateManagerById(int id, Manager manager) throws Exception;
 
-    void deleteManagerById(int id);
+    void deleteManagerById(int id) throws Exception;
 }

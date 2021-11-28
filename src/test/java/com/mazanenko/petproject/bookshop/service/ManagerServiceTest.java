@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,6 +27,9 @@ class ManagerServiceTest {
     @Mock
     private ManagerDAO managerDAO;
 
+    @Mock
+    private RESTConsumerForManagerEmail restConsumerForManagerEmail;
+
     private final Manager manager = new Manager();
     private final int id = 1;
     private final String email = "test@mail.ru";
@@ -37,22 +39,28 @@ class ManagerServiceTest {
     @BeforeEach
     void setUp() {
         manager.setId(id);
+        manager.setName("Name");
+        manager.setSurname("Surname");
         manager.setEmail(email);
         manager.setPassword(password);
     }
 
     @Test
     void createManagerShouldCreateNewManager() {
-        managerService.createManager(manager);
-
-        Assertions.assertTrue(new BCryptPasswordEncoder().matches(password, manager.getPassword()));
+        try {
+            managerService.createManager(manager);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Mockito.verify(managerDAO, Mockito.times(1)).create(manager);
     }
 
     @Test
-    void createManagerWhenManagerIsNull() {
-        managerService.createManager(null);
-
+    void createManagerWhenManagerIsNullShouldThrowException() {
+        Exception exception = Assertions.assertThrows(Exception.class, () -> {
+            managerService.createManager(null);
+        });
+        Assertions.assertTrue(exception.getMessage().contains("manager is null"));
         Mockito.verifyNoInteractions(managerDAO);
     }
 
@@ -118,7 +126,11 @@ class ManagerServiceTest {
     void updateManagerByIdWhenPasswordsMatch() {
         Mockito.doReturn(manager).when(managerDAO).read(id);
 
-        managerService.updateManagerById(id, manager);
+        try {
+            managerService.updateManagerById(id, manager);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Mockito.verify(managerDAO, Mockito.times(1)).update(id, manager);
     }
@@ -126,20 +138,42 @@ class ManagerServiceTest {
     @Test
     void updateManagerByIdWhenPasswordsDontMatch() {
         Manager managerWithNewPassword = new Manager();
+        managerWithNewPassword.setEmail(email);
         managerWithNewPassword.setPassword("newPassword");
 
         Mockito.doReturn(manager).when(managerDAO).read(id);
 
-        managerService.updateManagerById(id, managerWithNewPassword);
+        try {
+            managerService.updateManagerById(id, managerWithNewPassword);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Assertions.assertNotEquals("newPassword", managerWithNewPassword.getPassword());
+        try {
+            Mockito.verify(restConsumerForManagerEmail, Mockito.times(1))
+                    .changePassword(Mockito.anyString(), Mockito.anyString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Mockito.verify(managerDAO, Mockito.times(1)).update(id, managerWithNewPassword);
     }
 
     @Test
     void deleteManagerById() {
-        managerService.deleteManagerById(id);
+        Mockito.doReturn(manager).when(managerDAO).read(id);
 
+        try {
+            managerService.deleteManagerById(id);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            Mockito.verify(restConsumerForManagerEmail, Mockito.times(1)).deleteEmail(email);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Mockito.verify(managerDAO, Mockito.times(1)).delete(id);
     }
 }
