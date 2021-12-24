@@ -3,9 +3,9 @@ package com.mazanenko.petproject.bookshop.entity.event;
 public class CustomerSubscriptionEvent {
     private final String name;
     private final String customerEmail;
-    private final int productId;
+    private final Long productId;
 
-    public CustomerSubscriptionEvent(String name, String customerEmail, int productId) {
+    public CustomerSubscriptionEvent(String name, String customerEmail, Long productId) {
         this.name = name;
         this.customerEmail = customerEmail;
         this.productId = productId;
@@ -19,7 +19,7 @@ public class CustomerSubscriptionEvent {
         return customerEmail;
     }
 
-    public int getProductId() {
+    public Long getProductId() {
         return productId;
     }
 }

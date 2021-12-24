@@ -10,15 +10,15 @@ import java.util.List;
 public interface CustomerService {
     void createCustomer(Customer customer, DeliveryAddress address);
 
-    Customer getCustomerById(int id);
+    Customer getCustomerById(Long customerId);
 
     Customer getCustomerByEmail(String email);
 
     List<Customer> getAllCustomers();
 
-    void updateCustomerById(int id, Customer updatedCustomer, DeliveryAddress address);
+    void updateCustomerById(Long customerId, Customer updatedCustomer, DeliveryAddress address);
 
-    void deleteCustomerById(int id);
+    void deleteCustomerById(Long customerId);
 
     void deleteCustomerByEmail(String email);
 

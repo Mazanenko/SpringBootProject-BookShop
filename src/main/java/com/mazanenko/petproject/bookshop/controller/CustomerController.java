@@ -36,7 +36,7 @@ public class CustomerController {
 
     @GetMapping("/{id}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String showCustomer(@PathVariable("id") int id, Model model) {
+    public String showCustomer(@PathVariable("id") Long id, Model model) {
         model.addAttribute("customer", customerService.getCustomerById(id));
         return "/people/customers/show-customer";
     }
@@ -93,7 +93,7 @@ public class CustomerController {
 
     @GetMapping("/{id}/edit")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String editCustomer(@PathVariable("id") int id, ModelMap model) {
+    public String editCustomer(@PathVariable("id") Long id, ModelMap model) {
         Customer customer = customerService.getCustomerById(id);
 
         model.addAttribute("customer", customer);
@@ -114,7 +114,7 @@ public class CustomerController {
     public String updateCustomer(@ModelAttribute("customer") @Valid Customer customer,
                                  BindingResult customerResult,
                                  @ModelAttribute("address") @Valid DeliveryAddress address,
-                                 BindingResult addressResult, @PathVariable(required = false) Integer id,
+                                 BindingResult addressResult, @PathVariable(required = false) Long id,
                                  Principal principal) {
 
         // needed for user can't be able to change other user profile by changing {id} in edit form
@@ -145,7 +145,7 @@ public class CustomerController {
 
 
     @DeleteMapping(value = {"/profile/{id}", "/profile/delete"})
-    public String deleteCustomer(@PathVariable(required = false) Integer id, Principal principal) {
+    public String deleteCustomer(@PathVariable(required = false) Long id, Principal principal) {
         if (id == null) {
             customerService.deleteCustomerByEmail(principal.getName());
         } else {

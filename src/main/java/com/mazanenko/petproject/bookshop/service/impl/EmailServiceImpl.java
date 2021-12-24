@@ -1,14 +1,11 @@
 package com.mazanenko.petproject.bookshop.service.impl;
 
-import com.mazanenko.petproject.bookshop.dao.BookDAO;
-import com.mazanenko.petproject.bookshop.entity.Book;
-import com.mazanenko.petproject.bookshop.entity.Cart;
-import com.mazanenko.petproject.bookshop.entity.Customer;
-import com.mazanenko.petproject.bookshop.entity.Manager;
+import com.mazanenko.petproject.bookshop.entity.*;
 import com.mazanenko.petproject.bookshop.entity.event.CustomerRegistrationEvent;
 import com.mazanenko.petproject.bookshop.entity.event.CustomerSubscriptionEvent;
 import com.mazanenko.petproject.bookshop.entity.event.OrderEvent;
 import com.mazanenko.petproject.bookshop.entity.event.ProductArrivalEvent;
+import com.mazanenko.petproject.bookshop.repository.BookRepository;
 import com.mazanenko.petproject.bookshop.service.CustomerService;
 import com.mazanenko.petproject.bookshop.service.EmailService;
 import com.mazanenko.petproject.bookshop.service.ManagerService;
@@ -29,20 +26,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender javaMailSender;
-    private final BookDAO bookDAO;
     private final CustomerService customerService;
     private final ManagerService managerService;
+    private final BookRepository bookRepository;
 
     @Value("${spring.mail.username}")
     private String username;
 
     @Autowired
-    public EmailServiceImpl(JavaMailSender javaMailSender, BookDAO bookDAO, CustomerService customerService,
-                            ManagerService managerService) {
+    public EmailServiceImpl(JavaMailSender javaMailSender, CustomerService customerService,
+                            ManagerService managerService, BookRepository bookRepository) {
         this.javaMailSender = javaMailSender;
-        this.bookDAO = bookDAO;
         this.customerService = customerService;
         this.managerService = managerService;
+        this.bookRepository = bookRepository;
     }
 
     @Override
@@ -72,7 +69,7 @@ public class EmailServiceImpl implements EmailService {
     @EventListener
     @Override
     public void handleSubscriptionEvent(CustomerSubscriptionEvent event) {
-        Book book = bookDAO.read(event.getProductId());
+        Book book = bookRepository.getById(event.getProductId());
 
         switch (event.getName()) {
 
@@ -94,10 +91,11 @@ public class EmailServiceImpl implements EmailService {
     @EventListener
     @Override
     public void handleArrivalEvent(ProductArrivalEvent event) {
-        List<Integer> subscribersList = event.getBook().getSubscribersList();
+        //List<Integer> subscribersList = event.getBook().getSubscribersList();
+        List<Subscription> subscribersList = event.getBook().getSubscribersList();
 
         subscribersList.forEach(subscriber -> {
-            Customer customer = customerService.getCustomerById(subscriber);
+            Customer customer = customerService.getCustomerById(subscriber.getCustomer().getId());
             sendSimpleMessage(customer.getEmail(), "New arrival",
                     String.format("Hi! We are glad to tell you, that a book \"%s\" by %s is available to order now.",
                             event.getBook().getName(), event.getBook().getAuthor()));
@@ -110,7 +108,7 @@ public class EmailServiceImpl implements EmailService {
     public void handleOrderEvent(OrderEvent event) {
         AtomicInteger i = new AtomicInteger();
         Cart cart = event.getCart();
-        Customer customer = customerService.getCustomerById(cart.getCustomerId());
+        Customer customer = customerService.getCustomerById(cart.getCustomer().getId());
         List<String> list = new ArrayList<>();
         List<Manager> managerList = managerService.getAllManagers();
 

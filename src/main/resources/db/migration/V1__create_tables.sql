@@ -63,7 +63,8 @@ CREATE TABLE order_table
 
 CREATE TABLE subscription
 (
+    id          SERIAL PRIMARY KEY,
     product_id  integer REFERENCES book (id),
     customer_id integer REFERENCES customer (id),
-    PRIMARY KEY (product_id, customer_id)
+    UNIQUE (product_id, customer_id)
 )
