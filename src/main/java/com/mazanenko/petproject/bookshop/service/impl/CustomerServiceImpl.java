@@ -60,7 +60,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer getCustomerById(Long customerId) {
-        if (customerId == null || customerId <= 0) {
+        if (customerId <= 0) {
             return null;
         }
         return customerRepo.findById(customerId).orElse(null);
@@ -82,7 +82,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void updateCustomerById(Long customerId, Customer updatedCustomer, DeliveryAddress updatedAddress) {
-        if (customerId == null || customerId <= 0 || updatedCustomer == null || updatedAddress == null) {
+        if (customerId <= 0 || updatedCustomer == null || updatedAddress == null) {
             return;
         }
 
@@ -111,7 +111,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public void deleteCustomerById(Long customerId) {
-        if (customerId == null || customerId <= 0) {
+        if (customerId <= 0) {
             return;
         }
 
