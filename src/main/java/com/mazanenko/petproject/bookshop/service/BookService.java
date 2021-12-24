@@ -8,19 +8,19 @@ import java.util.List;
 public interface BookService {
     void createBook(Book book);
 
-    Book getBookById(int id);
+    Book getBookById(Long bookId);
 
     List<Book> getAllBooks();
 
-    void updateBookById(int id, Book updatedBook);
+    void updateBookById(Long bookId, Book updatedBook);
 
-    void setQuantity(int bookId, int newQuantity);
+    void setQuantity(Long bookId, int newQuantity);
 
-    void incrementBookQuantity(int bookId);
+    void incrementBookQuantity(Long bookId);
 
-    void decrementBookQuantity(int bookId) throws SQLException;
+    void decrementBookQuantity(Long bookId) throws SQLException;
 
-    void deleteBookById(int id);
+    void deleteBookById(Long bookId);
 
-    boolean isBookAvailable(int bookId);
+    boolean isBookAvailable(Long bookId);
 }

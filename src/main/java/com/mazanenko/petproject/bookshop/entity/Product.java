@@ -1,45 +1,53 @@
 package com.mazanenko.petproject.bookshop.entity;
 
+import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.List;
+import java.util.Objects;
 
+@MappedSuperclass
 public abstract class Product {
 
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
     @NotBlank(message = "Should be not empty")
+    @Column(name = "name")
     private String name;
 
     @Min(value = 0, message = "Should be greater then zero")
+    @Column(name = "price")
     private int price;
 
     @NotBlank(message = "Should be not empty")
+    @Column(name = "description")
     private String description;
 
     @PositiveOrZero(message = "Should be positive or zero")
+    @Column(name = "available_quantity")
     private int availableQuantity;
 
-    private List<Integer> subscribersList;
 
 
     public Product() {
     }
 
-    public Product(int id, String name, String description, int availableQuantity) {
+    public Product(Long id, String name, String description, int availableQuantity, int price) {
         this.id = id;
         this.name = name;
-
         this.description = description;
         this.availableQuantity = availableQuantity;
+        this.price = price;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -75,13 +83,6 @@ public abstract class Product {
         this.availableQuantity = availableQuantity;
     }
 
-    public List<Integer> getSubscribersList() {
-        return subscribersList;
-    }
-
-    public void setSubscribersList(List<Integer> subscribersList) {
-        this.subscribersList = subscribersList;
-    }
 
     @Override
     public String toString() {
@@ -91,5 +92,19 @@ public abstract class Product {
                 ", price=" + getPrice() + '\'' +
                 ", availableQuantity='" + getAvailableQuantity() + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return price == product.price && availableQuantity == product.availableQuantity && id.equals(product.id)
+                && name.equals(product.name) && Objects.equals(description, product.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, price, description, availableQuantity);
     }
 }
