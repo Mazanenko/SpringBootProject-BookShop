@@ -49,6 +49,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public void updateBookById(Long bookId, Book updatedBook) {
         if (bookId <= 0 || updatedBook == null) {
             return;
@@ -58,7 +59,6 @@ public class BookServiceImpl implements BookService {
             publishArrivalEvent(bookId);
         }
         updatedBook.setId(bookId);
-        // need to add collections from book entity?
         bookRepository.save(updatedBook);
     }
 

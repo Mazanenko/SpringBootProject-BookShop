@@ -5,7 +5,7 @@ import com.mazanenko.petproject.bookshop.entity.event.CustomerRegistrationEvent;
 import com.mazanenko.petproject.bookshop.entity.event.CustomerSubscriptionEvent;
 import com.mazanenko.petproject.bookshop.entity.event.OrderEvent;
 import com.mazanenko.petproject.bookshop.entity.event.ProductArrivalEvent;
-import com.mazanenko.petproject.bookshop.repository.BookRepository;
+import com.mazanenko.petproject.bookshop.service.BookService;
 import com.mazanenko.petproject.bookshop.service.CustomerService;
 import com.mazanenko.petproject.bookshop.service.EmailService;
 import com.mazanenko.petproject.bookshop.service.ManagerService;
@@ -28,18 +28,18 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     private final CustomerService customerService;
     private final ManagerService managerService;
-    private final BookRepository bookRepository;
+    private final BookService bookService;
 
     @Value("${spring.mail.username}")
     private String username;
 
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender, CustomerService customerService,
-                            ManagerService managerService, BookRepository bookRepository) {
+                            ManagerService managerService, BookService bookService) {
         this.javaMailSender = javaMailSender;
         this.customerService = customerService;
         this.managerService = managerService;
-        this.bookRepository = bookRepository;
+        this.bookService = bookService;
     }
 
     @Override
@@ -56,7 +56,14 @@ public class EmailServiceImpl implements EmailService {
     @EventListener
     @Override
     public void handleCustomerRegistrationEvent(CustomerRegistrationEvent event) {
+        if (event == null) {
+            return;
+        }
+
         Customer customer = customerService.getCustomerByEmail(event.getCustomerEmail());
+        if (customer == null) {
+            return;
+        }
 
         String message = String.format("Hello, %s! \n" + "Welcome to Booksland! Please, visit next link: " +
                         "http://localhost:8080/customer/activate/%s to activate your account and complete registration."
@@ -69,10 +76,16 @@ public class EmailServiceImpl implements EmailService {
     @EventListener
     @Override
     public void handleSubscriptionEvent(CustomerSubscriptionEvent event) {
-        Book book = bookRepository.getById(event.getProductId());
+        if (event == null) {
+            return;
+        }
+
+        Book book = bookService.getBookById(event.getProductId());
+        if (book == null) {
+            return;
+        }
 
         switch (event.getName()) {
-
             case "subscribed":
                 sendSimpleMessage(event.getCustomerEmail(), "Subscription",
                         String.format("Hi! You will be notified when the book \"%s\" by %s arrives at the warehouse.",
@@ -91,7 +104,6 @@ public class EmailServiceImpl implements EmailService {
     @EventListener
     @Override
     public void handleArrivalEvent(ProductArrivalEvent event) {
-        //List<Integer> subscribersList = event.getBook().getSubscribersList();
         List<Subscription> subscribersList = event.getBook().getSubscribersList();
 
         subscribersList.forEach(subscriber -> {
@@ -108,7 +120,7 @@ public class EmailServiceImpl implements EmailService {
     public void handleOrderEvent(OrderEvent event) {
         AtomicInteger i = new AtomicInteger();
         Cart cart = event.getCart();
-        Customer customer = customerService.getCustomerById(cart.getCustomer().getId());
+        Customer customer = cart.getCustomer();
         List<String> list = new ArrayList<>();
         List<Manager> managerList = managerService.getAllManagers();
 

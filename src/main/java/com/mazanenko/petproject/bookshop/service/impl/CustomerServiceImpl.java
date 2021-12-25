@@ -130,10 +130,12 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         Customer customer = getCustomerById(customerId);
-        if (customer != null) {
-            cartService.deleteAllOrdersFromCart(customer.getCart().getId());
-            customerRepo.deleteById(customerId);
+        if (customer == null) {
+            return;
         }
+
+        deleteAllOrdersFromCustomerCart(customer);
+        customerRepo.deleteById(customerId);
     }
 
     @Override
@@ -144,10 +146,12 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         Customer customer = getCustomerByEmail(email);
-        if (customer != null) {
-            cartService.deleteAllOrdersFromCart(customer.getCart().getId());
-            customerRepo.deleteByEmail(email);
+        if (customer == null) {
+            return;
         }
+
+        deleteAllOrdersFromCustomerCart(customer);
+        customerRepo.deleteByEmail(email);
     }
 
     @Override
@@ -190,8 +194,10 @@ public class CustomerServiceImpl implements CustomerService {
         if (customer == null) {
             return false;
         }
-        return book.getSubscribersList() != null && book.getSubscribersList().stream()
-                .map(Subscription::getCustomer).anyMatch(customer1 -> customer1.equals(customer));
+
+        return customer.getSubscriptions() != null
+                && customer.getSubscriptions().stream().map(Subscription::getBook)
+                .anyMatch(book1 -> book1.equals(book));
     }
 
     private void publishRegistrationEvent(String email) {
@@ -200,4 +206,12 @@ public class CustomerServiceImpl implements CustomerService {
         }
         applicationEventPublisher.publishEvent(new CustomerRegistrationEvent(email));
     }
+
+    private void deleteAllOrdersFromCustomerCart(Customer customer) {
+        if (customer == null) {
+            return;
+        }
+        cartService.deleteAllOrdersFromCart(customer.getCart());
+    }
+
 }

@@ -25,7 +25,7 @@ public interface CartService {
 
     void deleteOrderFromCart(Long productId, Cart cart);
 
-    void deleteAllOrdersFromCart(Long cartId);
+    void deleteAllOrdersFromCart(Cart cart);
 
     void makeAnOrderByCustomerEmail(String email);
 }

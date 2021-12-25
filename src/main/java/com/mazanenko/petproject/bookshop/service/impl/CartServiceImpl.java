@@ -157,18 +157,18 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteAllOrdersFromCart(Long cartId) {
-        if (cartId <= 0) {
-            return;
-        }
-
-        Cart cart = getCartById(cartId);
+    public void deleteAllOrdersFromCart(Cart cart) {
         if (cart == null) {
             return;
         }
 
-        cart.getOrderList().forEach(order -> deleteOrderFromCart(order.getBook().getId(), cart));
-        orderService.deleteAllOrdersByCartId(cartId);
+        cart.getOrderList().forEach(order -> {
+            Book tempBook = order.getBook();
+            int newQuantity = order.getQuantity() + tempBook.getAvailableQuantity();
+
+            bookService.setQuantity(tempBook.getId(), newQuantity);
+        });
+        orderService.deleteAllOrdersByCartId(cart.getId());
     }
 
     @Override

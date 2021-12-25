@@ -27,6 +27,9 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Override
     @NonNull
     @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,
-            attributePaths = {"orderList"})
+            attributePaths = {
+                    "orderList",
+                    "orderList.book"
+            })
     Optional<Cart> findById(@NonNull Long aLong);
 }

@@ -30,6 +30,15 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             })
     Optional<Customer> findByEmail(String email);
 
+    @Override
+    @NonNull
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,
+            attributePaths = {
+                    "deliveryAddress",
+                    "cart"
+            })
+    Optional<Customer> findById(@NonNull Long aLong);
+
     Optional<Customer> findByActivationCode(String code);
 
     void deleteByEmail(String email);
