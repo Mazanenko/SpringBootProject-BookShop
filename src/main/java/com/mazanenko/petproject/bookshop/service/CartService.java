@@ -7,27 +7,25 @@ import java.sql.SQLException;
 
 public interface CartService {
 
-    Cart getCartById(int cartId);
+    Cart getCartById(Long cartId);
 
     Cart getCartByCustomerEmail(String email);
 
-    Cart getCartByCustomerId(int id);
+    Cart getCartByCustomerId(Long customerId);
 
     void addToCart(Order order) throws SQLException;
 
-    void addToCartByCustomerId(int customerId, int bookId) throws SQLException;
+    void addToCartByCustomerId(Long customerId, Long bookId) throws SQLException;
 
-    void addToCartByCustomerEmail(String email, int bookId) throws SQLException;
+    void addToCartByCustomerEmail(String email, Long bookId) throws SQLException;
 
-    void incrementProduct(int productId, Cart cart) throws SQLException;
+    void incrementProduct(Long productId, Cart cart) throws SQLException;
 
-    void decrementProduct(int productId, Cart cart);
+    void decrementProduct(Long productId, Cart cart);
 
-    void updateOrderInCartById(int orderId, Order order);
+    void deleteOrderFromCart(Long productId, Cart cart);
 
-    void deleteOrderFromCart(int productId, Cart cart);
-
-    void deleteAllOrdersFromCart(int cartId);
+    void deleteAllOrdersFromCart(Long cartId);
 
     void makeAnOrderByCustomerEmail(String email);
 }

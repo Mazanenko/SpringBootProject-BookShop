@@ -22,6 +22,12 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             })
     List<Customer> findAll(@NonNull Sort sort);
 
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,
+            attributePaths = {
+                    "deliveryAddress",
+                    "cart",
+                    "subscriptions"
+            })
     Optional<Customer> findByEmail(String email);
 
     Optional<Customer> findByActivationCode(String code);

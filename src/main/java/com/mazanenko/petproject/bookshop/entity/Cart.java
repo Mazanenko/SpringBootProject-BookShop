@@ -1,38 +1,41 @@
 package com.mazanenko.petproject.bookshop.entity;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Entity
+@Table(name = "cart")
 public class Cart {
-    private int id;
-    private int customerId;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @OneToMany(mappedBy = "cart")
     private List<Order> orderList = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     public Cart() {}
 
-    public Cart(int id, int customerId, List<Order> orderList) {
+    public Cart(Long id, List<Order> orderList) {
         this.id = id;
-        this.customerId = customerId;
         this.orderList = orderList;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
     }
 
     public List<Order> getOrderList() {
@@ -43,6 +46,13 @@ public class Cart {
         this.orderList = orderList;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 
     public List<Order> getSortedOrderList() {
         return orderList.stream().sorted((Comparator.comparing(o -> o.getBook().getName())))
@@ -53,7 +63,19 @@ public class Cart {
     public String toString() {
         return "Cart{" +
                 "id=" + getId() +
-                ", customerId=" + getCustomerId() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cart cart = (Cart) o;
+        return id.equals(cart.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -63,7 +63,14 @@ public class CustomerServiceImpl implements CustomerService {
         if (customerId <= 0) {
             return null;
         }
-        return customerRepo.findById(customerId).orElse(null);
+
+        Customer customer = customerRepo.findById(customerId).orElse(null);
+        if (customer == null) {
+            return null;
+        }
+
+        customer.setRole("ROLE_CUSTOMER");
+        return customer;
     }
 
     @Override
@@ -71,7 +78,14 @@ public class CustomerServiceImpl implements CustomerService {
         if (email == null) {
             return null;
         }
-        return customerRepo.findByEmail(email).orElse(null);
+
+        Customer customer = customerRepo.findByEmail(email).orElse(null);
+        if (customer == null) {
+            return null;
+        }
+
+        customer.setRole("ROLE_CUSTOMER");
+        return customer;
     }
 
     @Override
@@ -96,12 +110,12 @@ public class CustomerServiceImpl implements CustomerService {
             updatedCustomer.setPassword(cryptedPassword);
         }
 
-        if (!(updatedCustomer.getId().equals(customerId))) {
-            updatedCustomer.setId(customerId);
-        }
-
+        updatedCustomer.setId(customerId);
         updatedCustomer.setActivated(true);
+
+        updatedAddress.setId(customerId);
         updatedCustomer.setDeliveryAddress(updatedAddress);
+
         updatedCustomer.setCart(tempCustomer.getCart());
         updatedCustomer.setSubscriptions(tempCustomer.getSubscriptions());
 
