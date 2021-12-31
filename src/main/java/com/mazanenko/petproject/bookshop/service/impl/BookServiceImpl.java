@@ -1,9 +1,12 @@
 package com.mazanenko.petproject.bookshop.service.impl;
 
+import com.mazanenko.petproject.bookshop.annotation.LogException;
 import com.mazanenko.petproject.bookshop.entity.Book;
 import com.mazanenko.petproject.bookshop.entity.event.ProductArrivalEvent;
 import com.mazanenko.petproject.bookshop.repository.BookRepository;
 import com.mazanenko.petproject.bookshop.service.BookService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
@@ -17,6 +20,8 @@ import java.util.List;
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(BookServiceImpl.class);
 
     @Autowired
     public BookServiceImpl(BookRepository bookRepository,
@@ -32,6 +37,8 @@ public class BookServiceImpl implements BookService {
             return;
         }
         bookRepository.save(book);
+
+        LOGGER.info("The book {} was created", book);
     }
 
     @Override
@@ -55,11 +62,19 @@ public class BookServiceImpl implements BookService {
             return;
         }
 
-        if (getBookById(bookId).getAvailableQuantity() == 0 && updatedBook.getAvailableQuantity() > 0) {
+        Book originalBook = getBookById(bookId);
+        if (originalBook == null) {
+            return;
+        }
+
+        if (originalBook.getAvailableQuantity() == 0 && updatedBook.getAvailableQuantity() > 0) {
             publishArrivalEvent(bookId);
         }
         updatedBook.setId(bookId);
         bookRepository.save(updatedBook);
+
+        LOGGER.info("The book {} by {} with ID {} wos updated. Now it is {}",
+                originalBook.getName(), originalBook.getAuthor(), bookId, updatedBook);
     }
 
     @Override
@@ -78,6 +93,9 @@ public class BookServiceImpl implements BookService {
         }
         book.setAvailableQuantity(newQuantity);
         bookRepository.save(book);
+
+        LOGGER.info("New available quantity for the book {} by {} with ID {} is {}",
+                book.getName(), book.getAuthor(), bookId, newQuantity);
     }
 
     @Override
@@ -94,9 +112,13 @@ public class BookServiceImpl implements BookService {
         int quantity = book.getAvailableQuantity();
         book.setAvailableQuantity(++quantity);
         updateBookById(bookId, book);
+
+        LOGGER.info("New available quantity for the book {} by {} with ID {} is {}",
+                book.getName(), book.getAuthor(), bookId, book.getAvailableQuantity());
     }
 
     @Override
+    @LogException
     public void decrementBookQuantity(Long bookId) throws SQLException {
         if (bookId <= 0) {
             return;
@@ -112,6 +134,9 @@ public class BookServiceImpl implements BookService {
         if (quantity >= 1) {
             book.setAvailableQuantity(--quantity);
             updateBookById(bookId, book);
+
+            LOGGER.info("New available quantity for the book {} by {} with ID {} is {}",
+                    book.getName(), book.getAuthor(), bookId, book.getAvailableQuantity());
         } else throw new SQLException();
     }
 
@@ -121,6 +146,8 @@ public class BookServiceImpl implements BookService {
             return;
         }
         bookRepository.deleteById(bookId);
+
+        LOGGER.info("The book with ID {} was deleted", bookId);
     }
 
     @Override
