@@ -3,6 +3,8 @@ package com.mazanenko.petproject.bookshop.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mazanenko.petproject.bookshop.annotation.LogException;
+import com.mazanenko.petproject.bookshop.annotation.LogExecutionTime;
 import com.mazanenko.petproject.bookshop.service.RESTConsumerForManagerEmail;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,8 @@ public class RESTConsumerForManagerEmailImplForYandexMail implements RESTConsume
     }
 
     @Override
+    @LogException
+    @LogExecutionTime
     public void createEmail(String email, String password) throws Exception {
         if (email == null || password == null) {
             throw new Exception("Email or password is null");
@@ -52,6 +56,8 @@ public class RESTConsumerForManagerEmailImplForYandexMail implements RESTConsume
     }
 
     @Override
+    @LogException
+    @LogExecutionTime
     public void changePassword(String email, String newPassword) throws Exception {
         if (email == null || newPassword == null) {
             throw new Exception("Email or new password is null");
@@ -74,6 +80,8 @@ public class RESTConsumerForManagerEmailImplForYandexMail implements RESTConsume
     }
 
     @Override
+    @LogException
+    @LogExecutionTime
     public void deleteEmail(String email) throws Exception {
         if (email == null) {
             throw new Exception("Email is null");
