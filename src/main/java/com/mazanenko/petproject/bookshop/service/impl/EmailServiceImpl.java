@@ -10,6 +10,8 @@ import com.mazanenko.petproject.bookshop.service.CustomerService;
 import com.mazanenko.petproject.bookshop.service.EmailService;
 import com.mazanenko.petproject.bookshop.service.ManagerService;
 import org.apache.tomcat.util.buf.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
@@ -29,6 +31,7 @@ public class EmailServiceImpl implements EmailService {
     private final CustomerService customerService;
     private final ManagerService managerService;
     private final BookService bookService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     @Value("${spring.mail.username}")
     private String username;
@@ -60,7 +63,7 @@ public class EmailServiceImpl implements EmailService {
             return;
         }
 
-        Customer customer = customerService.getCustomerByEmail(event.getCustomerEmail());
+        Customer customer = event.getCustomer();
         if (customer == null) {
             return;
         }
@@ -70,6 +73,9 @@ public class EmailServiceImpl implements EmailService {
                 , customer.getName(), customer.getActivationCode());
 
         sendSimpleMessage(customer.getEmail(), "Registration on booksland", message);
+
+        LOGGER.info("Sent activation message to customer {} {} with ID {} and email {}", customer.getName(),
+                customer.getSurname(), customer.getId(), customer.getEmail());
     }
 
     @Async
@@ -98,6 +104,8 @@ public class EmailServiceImpl implements EmailService {
                                 "of book \"%s\" by %s at the warehouse.", book.getName(), book.getAuthor()));
                 break;
         }
+        LOGGER.info("sent message about subscription event for book {} by {} to customer email {}", book.getName(),
+                book.getAuthor(), event.getCustomerEmail());
     }
 
     @Async
@@ -111,6 +119,9 @@ public class EmailServiceImpl implements EmailService {
             sendSimpleMessage(customer.getEmail(), "New arrival",
                     String.format("Hi! We are glad to tell you, that a book \"%s\" by %s is available to order now.",
                             event.getBook().getName(), event.getBook().getAuthor()));
+
+            LOGGER.info("Sent message about new arrival for book {} by {} to customer with email {}",
+                    event.getBook().getName(), event.getBook().getAuthor(), customer.getEmail());
         });
     }
 
@@ -121,13 +132,14 @@ public class EmailServiceImpl implements EmailService {
         AtomicInteger i = new AtomicInteger();
         Cart cart = event.getCart();
         Customer customer = cart.getCustomer();
-        List<String> list = new ArrayList<>();
+        List<String> orderList = new ArrayList<>();
         List<Manager> managerList = managerService.getAllManagers();
 
-        cart.getOrderList().forEach(order -> list.add(i.incrementAndGet() + ". " + order.getBook().getName() + " by " +
+        // filling list of orders
+        cart.getOrderList().forEach(order -> orderList.add(i.incrementAndGet() + ". " + order.getBook().getName() + " by " +
                 order.getBook().getAuthor() + " - " + order.getQuantity() + " pc."));
 
-        String messageForCustomer = "Hi! Your order: \n" + StringUtils.join(list, '\n') +
+        String messageForCustomer = "Hi! Your order: \n" + StringUtils.join(orderList, '\n') +
                 "\n Our manager will contact you as soon as possible to clarify the details of payment and delivery";
 
         String messageForManager = "Finally! Someone made new order. \n\nHere is customer's contact info:\n"
@@ -141,7 +153,7 @@ public class EmailServiceImpl implements EmailService {
                 + "House number: " + customer.getDeliveryAddress().getHouseNumber() + '\n'
                 + "Note: " + customer.getDeliveryAddress().getNote() + '\n' + '\n'
                 + "Order list: \n"
-                + StringUtils.join(list, '\n') +
+                + StringUtils.join(orderList, '\n') +
                 "\n\nPlease, contact to customer as soon as possible to clarify the details of payment and delivery.";
 
         // sending message to customer
@@ -152,5 +164,7 @@ public class EmailServiceImpl implements EmailService {
             managerList.forEach(manager -> sendSimpleMessage(manager.getEmail(),
                     "Alarm! New order.", messageForManager));
         }
+        LOGGER.info("Sent message about customer with email {} made an order {}", customer.getEmail(),
+                orderList);
     }
 }
