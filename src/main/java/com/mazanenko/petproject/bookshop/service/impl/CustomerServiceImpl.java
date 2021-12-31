@@ -1,10 +1,13 @@
 package com.mazanenko.petproject.bookshop.service.impl;
 
+import com.mazanenko.petproject.bookshop.annotation.LogException;
 import com.mazanenko.petproject.bookshop.entity.*;
 import com.mazanenko.petproject.bookshop.entity.event.CustomerRegistrationEvent;
 import com.mazanenko.petproject.bookshop.repository.CustomerRepository;
 import com.mazanenko.petproject.bookshop.service.CartService;
 import com.mazanenko.petproject.bookshop.service.CustomerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
@@ -25,6 +28,7 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepo;
     private CartService cartService;
     private ApplicationEventPublisher applicationEventPublisher;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerServiceImpl.class);
 
     public CustomerServiceImpl() {
     }
@@ -38,6 +42,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @LogException
     public void createCustomer(Customer customer, DeliveryAddress address) {
         if (customer == null || address == null) {
             return;
@@ -55,7 +60,10 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setCart(cart);
 
         customerRepo.save(customer);
-        publishRegistrationEvent(customer.getEmail());
+        publishRegistrationEvent(customer);
+
+        LOGGER.info("Customer {} {} with email {} successfully created",
+                customer.getName(), customer.getSurname(), customer.getEmail());
     }
 
     @Override
@@ -95,32 +103,33 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional
     public void updateCustomerById(Long customerId, Customer updatedCustomer, DeliveryAddress updatedAddress) {
         if (customerId <= 0 || updatedCustomer == null || updatedAddress == null) {
             return;
         }
 
-        Customer tempCustomer = customerRepo.findById(customerId).orElse(null);
-        if (tempCustomer == null) {
+        Customer originalCustomer = customerRepo.findById(customerId).orElse(null);
+        if (originalCustomer == null) {
             return;
         }
-
-        if (!(updatedCustomer.getPassword().equals(tempCustomer.getPassword()))) {
-            String cryptedPassword = BCrypt.hashpw(updatedCustomer.getPassword(), BCrypt.gensalt());
-            updatedCustomer.setPassword(cryptedPassword);
-        }
-
         updatedCustomer.setId(customerId);
         updatedCustomer.setActivated(true);
-
+        updatedCustomer.setCart(originalCustomer.getCart());
+        updatedCustomer.setSubscriptions(originalCustomer.getSubscriptions());
         updatedAddress.setId(customerId);
-        updatedCustomer.setDeliveryAddress(updatedAddress);
 
-        updatedCustomer.setCart(tempCustomer.getCart());
-        updatedCustomer.setSubscriptions(tempCustomer.getSubscriptions());
-
+        updatePassword(originalCustomer, updatedCustomer);
+        updateAddress(originalCustomer, updatedCustomer, updatedAddress);
         customerRepo.save(updatedCustomer);
+
+        if (!originalCustomer.equals(updatedCustomer)) {
+            LOGGER.info("The customer's profile {} {} with ID {} and email {} was updated. Now it is {}",
+                    originalCustomer.getName(), originalCustomer.getSurname(), originalCustomer.getId(),
+                    originalCustomer.getEmail(), updatedCustomer);
+        }
     }
+
 
     @Override
     @Transactional
@@ -136,6 +145,9 @@ public class CustomerServiceImpl implements CustomerService {
 
         deleteAllOrdersFromCustomerCart(customer);
         customerRepo.deleteById(customerId);
+
+        LOGGER.info("The customer's profile {} {} with ID {} and email {} was deleted", customer.getName(),
+                customer.getSurname(), customer.getId(), customer.getEmail());
     }
 
     @Override
@@ -152,6 +164,9 @@ public class CustomerServiceImpl implements CustomerService {
 
         deleteAllOrdersFromCustomerCart(customer);
         customerRepo.deleteByEmail(email);
+
+        LOGGER.info("The customer's profile {} {} with ID {} and email {} was deleted", customer.getName(),
+                customer.getSurname(), customer.getId(), customer.getEmail());
     }
 
     @Override
@@ -179,6 +194,8 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setActivationCode(null);
             customer.setActivated(true);
             customerRepo.save(customer);
+            LOGGER.info("The customer's profile {} {} with ID {} and email {} was activated", customer.getName(),
+                    customer.getSurname(), customer.getId(), customer.getEmail());
             return true;
         }
         return false;
@@ -200,11 +217,12 @@ public class CustomerServiceImpl implements CustomerService {
                 .anyMatch(book1 -> book1.equals(book));
     }
 
-    private void publishRegistrationEvent(String email) {
-        if (email == null) {
+
+    private void publishRegistrationEvent(Customer customer) {
+        if (customer == null) {
             return;
         }
-        applicationEventPublisher.publishEvent(new CustomerRegistrationEvent(email));
+        applicationEventPublisher.publishEvent(new CustomerRegistrationEvent(customer));
     }
 
     private void deleteAllOrdersFromCustomerCart(Customer customer) {
@@ -212,6 +230,39 @@ public class CustomerServiceImpl implements CustomerService {
             return;
         }
         cartService.deleteAllOrdersFromCart(customer.getCart());
+    }
+
+    private void updatePassword(Customer originalCustomer, Customer updatedCustomer) {
+        if (originalCustomer == null || updatedCustomer == null) {
+            return;
+        }
+        if (updatedCustomer.getPassword().equals(originalCustomer.getPassword())) {
+            return;
+        }
+
+        String cryptedPassword = BCrypt.hashpw(updatedCustomer.getPassword(), BCrypt.gensalt());
+        updatedCustomer.setPassword(cryptedPassword);
+
+        LOGGER.info("Password for customer {} {} with ID {} and email {} was updated",
+                originalCustomer.getName(), originalCustomer.getSurname(), originalCustomer.getId(),
+                originalCustomer.getEmail());
+    }
+
+    private void updateAddress(Customer originalCustomer, Customer updatedCustomer, DeliveryAddress updatedAddress) {
+        if (originalCustomer == null || updatedCustomer == null || updatedAddress == null) {
+            return;
+        }
+
+        DeliveryAddress originalAddress = originalCustomer.getDeliveryAddress();
+        if (!originalAddress.equals(updatedAddress)) {
+
+            updatedCustomer.setDeliveryAddress(updatedAddress);
+
+            LOGGER.info("The delivery address for customer {} {} with ID {} and email {} was updated. Now it is {}",
+                    originalCustomer.getName(), originalCustomer.getSurname(), originalCustomer.getId(),
+                    originalCustomer.getEmail(), updatedAddress);
+
+        } else updatedCustomer.setDeliveryAddress(originalAddress);
     }
 
 }
