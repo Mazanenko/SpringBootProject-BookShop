@@ -109,11 +109,12 @@ public class DeliveryAddress {
     @Override
     public String toString() {
         return "DeliveryAddress{" +
-                ", country='" + country + '\'' +
-                ", city='" + city + '\'' +
-                ", street='" + street + '\'' +
-                ", houseNumber=" + houseNumber +
-                ", note='" + note + '\'' +
+                "id= " + getId() +
+                ", country='" + getCountry() + '\'' +
+                ", city='" + getCity() + '\'' +
+                ", street='" + getStreet() + '\'' +
+                ", houseNumber=" + getHouseNumber() +
+                ", note='" + getNote() + '\'' +
                 '}';
     }
 

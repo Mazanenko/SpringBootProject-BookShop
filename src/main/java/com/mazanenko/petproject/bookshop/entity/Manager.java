@@ -17,4 +17,14 @@ public final class Manager extends Person {
             this.setRole("ROLE_ADMIN");
         }
     }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "id=" + super.getId() +
+                ", name='" + super.getName() + '\'' +
+                ", surname='" + super.getSurname() + '\'' +
+                ", email='" + super.getEmail() + '\'' +
+                '}';
+    }
 }

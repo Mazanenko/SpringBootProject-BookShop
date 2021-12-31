@@ -87,8 +87,7 @@ public class Book extends Product {
         return "Book{" +
                 "id=" + getId() +
                 ", name='" + getName() + '\'' +
-                "author='" + getAuthor() + '\'' +
-                ", availableQuantity='" + getAvailableQuantity() + '\'' +
+                ", author='" + getAuthor() + '\'' +
                 '}';
     }
 

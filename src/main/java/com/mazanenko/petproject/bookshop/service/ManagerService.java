@@ -14,7 +14,7 @@ public interface ManagerService {
 
     List<Manager> getAllManagers();
 
-    void updateManagerById(Long managerId, Manager manager) throws Exception;
+    void updateManagerById(Long managerId, Manager updatedManager) throws Exception;
 
     void deleteManagerById(Long managerId) throws Exception;
 }

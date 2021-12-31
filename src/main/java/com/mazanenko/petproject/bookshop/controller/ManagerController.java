@@ -79,7 +79,6 @@ public class ManagerController {
             , @PathVariable("id") Long id, Model model) {
 
         if (bindingResult.hasErrors() && !bindingResult.hasFieldErrors("email")) {
-            System.out.println(bindingResult.getAllErrors());
             return "/people/managers/edit-manager";
         } else {
             try {

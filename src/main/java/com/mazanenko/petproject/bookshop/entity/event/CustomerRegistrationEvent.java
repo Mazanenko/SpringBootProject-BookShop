@@ -1,13 +1,15 @@
 package com.mazanenko.petproject.bookshop.entity.event;
 
-public class CustomerRegistrationEvent {
-    private final String customerEmail;
+import com.mazanenko.petproject.bookshop.entity.Customer;
 
-    public CustomerRegistrationEvent(String customerEmail) {
-        this.customerEmail = customerEmail;
+public class CustomerRegistrationEvent {
+    private final Customer customer;
+
+    public CustomerRegistrationEvent(Customer customer) {
+        this.customer = customer;
     }
 
-    public String getCustomerEmail() {
-        return customerEmail;
+    public Customer getCustomer() {
+        return customer;
     }
 }
