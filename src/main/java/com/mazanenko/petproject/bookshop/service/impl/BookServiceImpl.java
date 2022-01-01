@@ -113,7 +113,7 @@ public class BookServiceImpl implements BookService {
         book.setAvailableQuantity(++quantity);
         updateBookById(bookId, book);
 
-        LOGGER.info("New available quantity for the book {} by {} with ID {} is {}",
+        LOGGER.info("Increment quantity. New available quantity for the book {} by {} with ID {} is {}",
                 book.getName(), book.getAuthor(), bookId, book.getAvailableQuantity());
     }
 
@@ -135,7 +135,7 @@ public class BookServiceImpl implements BookService {
             book.setAvailableQuantity(--quantity);
             updateBookById(bookId, book);
 
-            LOGGER.info("New available quantity for the book {} by {} with ID {} is {}",
+            LOGGER.info("Decrement quantity. New available quantity for the book {} by {} with ID {} is {}",
                     book.getName(), book.getAuthor(), bookId, book.getAvailableQuantity());
         } else throw new SQLException();
     }

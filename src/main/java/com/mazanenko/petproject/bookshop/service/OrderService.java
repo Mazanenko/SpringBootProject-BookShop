@@ -16,13 +16,13 @@ public interface OrderService {
 
     List<Order> readALLOrdersByCartId(Long cartId);
 
-    void updateOrder(Long orderId, Order updatedOrder);
+    void updateOrder(Order updatedOrder);
 
-    void incrementOrderQuantity(Long orderId);
+    void incrementOrderQuantity(Order order);
 
-    void decrementOrderQuantity(Long orderId);
+    void decrementOrderQuantity(Order order);
 
-    void deleteOrder(Long orderId);
+    void deleteOrder(Order order);
 
     void deleteAllOrdersByCartId(Long cartId);
 }
