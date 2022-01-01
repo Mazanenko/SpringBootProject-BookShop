@@ -112,6 +112,9 @@ public class EmailServiceImpl implements EmailService {
     @EventListener
     @Override
     public void handleArrivalEvent(ProductArrivalEvent event) {
+        if (event == null) {
+            return;
+        }
         List<Subscription> subscribersList = event.getBook().getSubscribersList();
 
         subscribersList.forEach(subscriber -> {
@@ -129,6 +132,10 @@ public class EmailServiceImpl implements EmailService {
     @EventListener
     @Override
     public void handleOrderEvent(OrderEvent event) {
+        if (event == null) {
+            return;
+        }
+
         AtomicInteger i = new AtomicInteger();
         Cart cart = event.getCart();
         Customer customer = cart.getCustomer();
@@ -139,10 +146,34 @@ public class EmailServiceImpl implements EmailService {
         cart.getOrderList().forEach(order -> orderList.add(i.incrementAndGet() + ". " + order.getBook().getName() + " by " +
                 order.getBook().getAuthor() + " - " + order.getQuantity() + " pc."));
 
-        String messageForCustomer = "Hi! Your order: \n" + StringUtils.join(orderList, '\n') +
-                "\n Our manager will contact you as soon as possible to clarify the details of payment and delivery";
+        String messageForCustomer = createMessageAboutOrderEventForCustomer(orderList);
+        String messageForManager = createMessageAboutOrderEventForManager(customer, orderList);
 
-        String messageForManager = "Finally! Someone made new order. \n\nHere is customer's contact info:\n"
+        // sending message to customer
+        sendSimpleMessage(customer.getEmail(), "The order at Booksland", messageForCustomer);
+
+        // sending message to managers
+        if(managerList != null) {
+            managerList.forEach(manager -> sendSimpleMessage(manager.getEmail(),
+                    "Alarm! New order.", messageForManager));
+        }
+        LOGGER.info("Sent message about customer with email {} made an order {}", customer.getEmail(),
+                orderList);
+    }
+
+    private String createMessageAboutOrderEventForCustomer(List<String> orderList) {
+        if (orderList == null) {
+            return null;
+        }
+        return "Hi! Your order: \n" + StringUtils.join(orderList, '\n') +
+                "\n Our manager will contact you as soon as possible to clarify the details of payment and delivery";
+    }
+
+    private String createMessageAboutOrderEventForManager(Customer customer, List<String> orderList) {
+        if (customer == null || orderList == null) {
+            return null;
+        }
+        return "Finally! Someone made new order. \n\nHere is customer's contact info:\n"
                 + "Name: " + customer.getName() + " " + customer.getSurname() + '\n'
                 + "Email: " + customer.getEmail() + '\n'
                 + "Phone: " + customer.getPhone() + '\n' + '\n'
@@ -155,16 +186,5 @@ public class EmailServiceImpl implements EmailService {
                 + "Order list: \n"
                 + StringUtils.join(orderList, '\n') +
                 "\n\nPlease, contact to customer as soon as possible to clarify the details of payment and delivery.";
-
-        // sending message to customer
-        sendSimpleMessage(customer.getEmail(), "The order at Booksland", messageForCustomer);
-
-        // sending message to managers
-        if(managerList != null) {
-            managerList.forEach(manager -> sendSimpleMessage(manager.getEmail(),
-                    "Alarm! New order.", messageForManager));
-        }
-        LOGGER.info("Sent message about customer with email {} made an order {}", customer.getEmail(),
-                orderList);
     }
 }

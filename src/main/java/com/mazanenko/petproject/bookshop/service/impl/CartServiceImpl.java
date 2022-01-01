@@ -1,5 +1,6 @@
 package com.mazanenko.petproject.bookshop.service.impl;
 
+import com.mazanenko.petproject.bookshop.annotation.LogException;
 import com.mazanenko.petproject.bookshop.entity.Book;
 import com.mazanenko.petproject.bookshop.entity.Cart;
 import com.mazanenko.petproject.bookshop.entity.Order;
@@ -8,12 +9,16 @@ import com.mazanenko.petproject.bookshop.repository.CartRepository;
 import com.mazanenko.petproject.bookshop.service.BookService;
 import com.mazanenko.petproject.bookshop.service.CartService;
 import com.mazanenko.petproject.bookshop.service.OrderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -22,6 +27,7 @@ public class CartServiceImpl implements CartService {
     private final OrderService orderService;
     private final BookService bookService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final static Logger LOGGER = LoggerFactory.getLogger(CartServiceImpl.class);
 
     @Autowired
     public CartServiceImpl(CartRepository cartRepo, OrderService orderService,
@@ -62,12 +68,13 @@ public class CartServiceImpl implements CartService {
         if (order == null) {
             return;
         }
-        Order tempOrder = orderService.readOrderByCartIdAndProductId(order.getCart().getId(), order.getBook().getId());
+        Order orderFromDatabase = orderService.readOrderByCartIdAndProductId(order.getCart().getId(),
+                order.getBook().getId());
 
-        if (tempOrder == null) {
+        if (orderFromDatabase == null) {
             orderService.createOrder(order);
         } else {
-            orderService.incrementOrderQuantity(tempOrder.getId());
+            orderService.incrementOrderQuantity(orderFromDatabase);
         }
         bookService.decrementBookQuantity(order.getBook().getId());
     }
@@ -83,6 +90,8 @@ public class CartServiceImpl implements CartService {
         if (cart == null || book == null) {
             return;
         }
+        LOGGER.info("Manager adding book ({} by {} with ID {}) to customer's cart (ID {})", book.getName(),
+                book.getAuthor(), book.getId(), cart.getId());
 
         Order order = new Order(cart, book, 1);
         addToCart(order);
@@ -98,6 +107,8 @@ public class CartServiceImpl implements CartService {
         if (cart == null || book == null) {
             return;
         }
+        LOGGER.info("Customer (email {}) adding book ({} by {} with ID {}) to cart", email, book.getName(),
+                book.getAuthor(), book.getId());
 
         Order order = new Order(cart, book, 1);
         addToCart(order);
@@ -113,7 +124,7 @@ public class CartServiceImpl implements CartService {
         for (Order order : cart.getOrderList()) {
             if (order.getBook().getId().equals(productId)) {
                 bookService.decrementBookQuantity(bookService.getBookById(productId).getId());
-                orderService.incrementOrderQuantity(order.getId());
+                orderService.incrementOrderQuantity(order);
             }
         }
     }
@@ -127,7 +138,7 @@ public class CartServiceImpl implements CartService {
 
         cart.getOrderList().forEach(order -> {
             if (order.getBook().getId().equals(productId)) {
-                orderService.decrementOrderQuantity(order.getId());
+                orderService.decrementOrderQuantity(order);
                 bookService.incrementBookQuantity(bookService.getBookById(productId).getId());
             }
         });
@@ -149,7 +160,7 @@ public class CartServiceImpl implements CartService {
             if (order.getBook().getId().equals(productId)) {
                 int newQuantity = book.getAvailableQuantity() + order.getQuantity();
 
-                orderService.deleteOrder(order.getId());
+                orderService.deleteOrder(order);
                 bookService.setQuantity(productId, newQuantity);
             }
         });
@@ -157,6 +168,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @LogException
     public void deleteAllOrdersFromCart(Cart cart) {
         if (cart == null) {
             return;
@@ -186,6 +198,12 @@ public class CartServiceImpl implements CartService {
 
         publishOrderEvent(cart);
         orderService.deleteAllOrdersByCartId(cart.getId());
+
+        List<String> orderList = new ArrayList<>();
+        cart.getOrderList().forEach(order -> orderList.add(order.getBook().getName() +
+                " by " + order.getBook().getAuthor() + " - " + order.getQuantity() + " pc."));
+
+        LOGGER.info("Customer (email {}) made the order {}", email, orderList);
     }
 
 
