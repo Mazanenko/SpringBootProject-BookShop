@@ -22,11 +22,11 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler im
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
                                 Authentication authentication) throws IOException, ServletException {
 
-        logOutAuthentication(authentication);
+        loggingLogout(authentication);
         super.onLogoutSuccess(request, response, authentication);
     }
 
-    private void logOutAuthentication(Authentication authentication) {
+    private void loggingLogout(Authentication authentication) {
         if (authentication == null) {
             return;
         }
