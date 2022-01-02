@@ -1,6 +1,7 @@
 package com.mazanenko.petproject.bookshop.service.impl;
 
 
+import com.mazanenko.petproject.bookshop.annotation.LogException;
 import com.mazanenko.petproject.bookshop.entity.Customer;
 import com.mazanenko.petproject.bookshop.entity.Person;
 import com.mazanenko.petproject.bookshop.service.CustomerService;
@@ -32,6 +33,7 @@ public class UserServiceImpl implements com.mazanenko.petproject.bookshop.servic
     }
 
     @Override
+    @LogException
     public Person findByEmail(String email) throws UsernameNotFoundException {
         Customer customer = customerService.getCustomerByEmail(email);
         Person manager = managerService.getManagerByEmail(email);
@@ -56,6 +58,10 @@ public class UserServiceImpl implements com.mazanenko.petproject.bookshop.servic
 
 
     private Collection<? extends GrantedAuthority> rolesToAuthorities(String role) {
+        if (role == null) {
+            return null;
+        }
+
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role);
         ArrayList<GrantedAuthority> list = new ArrayList<>();
         list.add(grantedAuthority);

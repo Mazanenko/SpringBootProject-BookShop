@@ -10,6 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+
 
 @Configuration
 @EnableWebSecurity
@@ -34,9 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/customer/**").hasAnyRole("MANAGER", "ADMIN")
                 .antMatchers("/**").hasRole("ADMIN")
                 .and()
-                .formLogin().permitAll()
+                .formLogin().permitAll().successHandler(authenticationSuccessHandler())
                 .and()
-                .logout().logoutSuccessUrl("/");
+                .logout().logoutSuccessUrl("/").logoutSuccessHandler(logoutSuccessHandler());
     }
 
     @Bean
@@ -51,5 +54,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         authenticationProvider.setUserDetailsService(userService);
         return authenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
+    }
+
+    @Bean
+    public LogoutSuccessHandler logoutSuccessHandler() {
+        return new CustomLogoutSuccessHandler();
     }
 }
