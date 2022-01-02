@@ -28,7 +28,7 @@ public class LogExceptionAnnotationAspect {
         String[] parameterNames = signature.getParameterNames();
 
 
-        logger.error("Method {} was executed with an error {}. Args names: {}, values: {}",
+        logger.error("Method {} was executed with an error \"{}\". Args names: {}, values: {}",
                 joinPoint.getSignature(), exception.getMessage(), parameterNames, joinPoint.getArgs());
     }
 }
