@@ -134,13 +134,13 @@ class ManagerServiceTest {
 
         //Then
         Assertions.assertEquals(manager, managerService.getManagerById(id));
-        Assertions.assertEquals(manager.getRole(), role);
+        Assertions.assertEquals(role, manager.getRole());
     }
 
     @Test
     void getManagerByIdShouldReturnNull() {
         // When id is zero or less than zero
-        //Than
+        //Then
         Assertions.assertNull(managerService.getManagerById(0L));
         Assertions.assertNull(managerService.getManagerById(-1L));
     }
@@ -151,7 +151,7 @@ class ManagerServiceTest {
         String email = null;
         // When
         manager.setEmail(email);
-        //Than
+        //Then
         Assertions.assertNull(managerService.getManagerById(id));
     }
 
@@ -319,11 +319,11 @@ class ManagerServiceTest {
     }
 
     @Test
-    void deleteManagerByIdWhenReturnedManagerIsNull() {
+    void deleteManagerByIdWhenReturnedManagerIsNotExist() {
         //Given id > 0
 
         //When
-        Mockito.when(managerRepo.findById(id)).thenReturn(null);
+        Mockito.when(managerRepo.findById(id)).thenReturn(Optional.empty());
         try {
             managerService.deleteManagerById(id);
         } catch (Exception e) {
