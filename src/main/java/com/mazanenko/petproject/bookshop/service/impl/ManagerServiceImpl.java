@@ -42,7 +42,6 @@ public class ManagerServiceImpl implements ManagerService {
         if (manager == null) {
             throw new Exception("manager is null");
         }
-
         String password = generatePassword();
         String cryptedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         manager.setPassword(cryptedPassword);
@@ -50,29 +49,29 @@ public class ManagerServiceImpl implements ManagerService {
         String email = generateEmail(manager);
         manager.setEmail(email);
 
-        String credentials = "Manager " + manager.getName() + " " + manager.getSurname() + " successfully added \n"
-                + " Credentials: " + System.lineSeparator()
-                + "\n Email: " + manager.getEmail()
-                + "\n Password: " + password;
+        if (restConsumerForManagerEmail.createEmail(manager.getEmail(), password)) {
+            try {
+                managerRepo.saveAndFlush(manager);
+            } catch (DataAccessException e) {
+                LOGGER.error("Exception \"{}\" while trying save manager: {} {} with email: {}",
+                        e.getCause().getMessage(), manager.getName(), manager.getSurname(), manager.getEmail());
 
-        try {
-            managerRepo.saveAndFlush(manager);
-        } catch (DataAccessException e) {
-            LOGGER.error("Exception {} while trying save manager {} {} with email {}", e.getCause().getMessage(),
-                    manager.getName(), manager.getSurname(), manager.getEmail());
-
-            if (e.getCause().getMessage().contains("email_unique")) {
-                String newEmail = generateEmail(manager);
-                manager.setEmail(newEmail);
-                return credentials;
+                if (e.getCause().getMessage().contains("email_unique")) {
+                    createManager(manager);
+                    return null;
+                }
             }
-        } finally {
-            restConsumerForManagerEmail.createEmail(manager.getEmail(), password);
-        }
+            LOGGER.info("Manager: {} {} with email: {} successfully created", manager.getName(), manager.getSurname(),
+                    manager.getEmail());
 
-        LOGGER.info("Manager {} {} with email {} successfully created", manager.getName(), manager.getSurname(),
-                manager.getEmail());
-        return credentials;
+            return "Manager " + manager.getName() + " " + manager.getSurname() + " successfully added \n"
+                    + " Credentials: \n"
+                    + "\n Email: " + manager.getEmail()
+                    + "\n Password: " + password;
+
+        } else createManager(manager);
+
+        return null;
     }
 
     @Override
@@ -81,7 +80,7 @@ public class ManagerServiceImpl implements ManagerService {
             return null;
         }
         Manager manager = managerRepo.findById(id).orElse(null);
-        if (manager == null) {
+        if (manager == null || manager.getEmail() == null) {
             return null;
         }
 
@@ -113,15 +112,16 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public void updateManagerById(Long id, Manager updatedManager) throws Exception {
-        if (id <= 0) {
+        if (id <= 0 || updatedManager == null) {
             return;
         }
 
         Manager managerFromDatabase = managerRepo.findById(id).orElse(null);
-        if (managerFromDatabase == null || updatedManager == null) {
+        if (managerFromDatabase == null) {
             return;
         }
 
+        updatedManager.setId(id);
         updatePassword(updatedManager, managerFromDatabase);
         managerRepo.save(updatedManager);
 
@@ -138,6 +138,9 @@ public class ManagerServiceImpl implements ManagerService {
             return;
         }
         Manager manager = getManagerById(id);
+        if (manager == null || manager.getEmail() == null) {
+            return;
+        }
         restConsumerForManagerEmail.deleteEmail(manager.getEmail());
         managerRepo.deleteById(id);
 
@@ -187,16 +190,22 @@ public class ManagerServiceImpl implements ManagerService {
             return;
         }
         if (updatedManager.getPassword().equals(managerFromDatabase.getPassword())) {
+            LOGGER.info("Password for manager {} {} with ID {} and email {} do not updated, because current pass and " +
+                            "new pass are equals",
+                    managerFromDatabase.getName(), managerFromDatabase.getSurname(), managerFromDatabase.getId(),
+                    managerFromDatabase.getEmail());
             return;
         }
 
         String cryptedPassword = BCrypt.hashpw(updatedManager.getPassword(), BCrypt.gensalt());
-        restConsumerForManagerEmail.changePassword(updatedManager.getEmail(), updatedManager.getPassword());
-        updatedManager.setPassword(cryptedPassword);
-        updatedManager.setId(managerFromDatabase.getId());
 
-        LOGGER.info("Password for manager {} {} with ID {} and email {} was updated",
-                managerFromDatabase.getName(), managerFromDatabase.getSurname(), managerFromDatabase.getId(),
-                managerFromDatabase.getEmail());
+        if (restConsumerForManagerEmail.changePassword(updatedManager.getEmail(), updatedManager.getPassword())) {
+            updatedManager.setPassword(cryptedPassword);
+            updatedManager.setId(managerFromDatabase.getId());
+
+            LOGGER.info("Password for manager {} {} with ID {} and email {} was updated",
+                    managerFromDatabase.getName(), managerFromDatabase.getSurname(), managerFromDatabase.getId(),
+                    managerFromDatabase.getEmail());
+        }
     }
 }
