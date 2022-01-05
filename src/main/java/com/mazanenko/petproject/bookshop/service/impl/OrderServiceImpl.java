@@ -13,8 +13,11 @@ import java.util.List;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-    private final OrderRepository orderRepo;
+    private OrderRepository orderRepo;
     private final static Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
+
+    public OrderServiceImpl() {
+    }
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepo) {
@@ -36,7 +39,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order readOrder(Long orderId) {
-        if (orderId == null) {
+        if (orderId <= 0) {
             return null;
         }
         return orderRepo.findById(orderId).orElse(null);
@@ -44,7 +47,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order readOrderByCartIdAndProductId(Long cartId, Long productId) {
-        if (cartId == null || productId == null) {
+        if (cartId <= 0 || productId <= 0) {
             return null;
         }
         return orderRepo.findByCart_IdAndBook_Id(cartId, productId).orElse(null);
@@ -59,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true)
     public List<Order> readALLOrdersByCartId(Long cartId) {
-        if (cartId == null) {
+        if (cartId <= 0) {
             return null;
         }
         return orderRepo.findAllByCart_Id(cartId);
@@ -84,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
         updateOrder(order);
 
         LOGGER.info("Increment quantity for order (ID {}) with book ({} by {} with ID {}) " +
-                        "was created for customer's cart with ID {}. Now quantity is {}", order.getId(), order.getBook().getName(),
+                        "for customer's cart with ID {}. Now quantity is {}", order.getId(), order.getBook().getName(),
                 order.getBook().getAuthor(), order.getBook().getId(), order.getCart().getId(), order.getQuantity());
     }
 
@@ -100,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
             updateOrder(order);
 
             LOGGER.info("Decrement quantity for order (ID {}) with book ({} by {} with ID {}) " +
-                            "was created for customer's cart with ID {}. Now quantity is {}", order.getId(),
+                            "for customer's cart with ID {}. Now quantity is {}", order.getId(),
                     order.getBook().getName(), order.getBook().getAuthor(), order.getBook().getId(),
                     order.getCart().getId(), order.getQuantity());
         } else {
