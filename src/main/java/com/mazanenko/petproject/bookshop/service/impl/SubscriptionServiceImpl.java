@@ -18,11 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
 
-    private final SubscriptionRepository subscriptionRepo;
-    private final CustomerService customerService;
-    private final BookService bookService;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private SubscriptionRepository subscriptionRepo;
+    private CustomerService customerService;
+    private BookService bookService;
+    private ApplicationEventPublisher applicationEventPublisher;
     private final static Logger LOGGER = LoggerFactory.getLogger(SubscriptionServiceImpl.class);
+
+    public SubscriptionServiceImpl() {
+    }
 
     @Autowired
     public SubscriptionServiceImpl(SubscriptionRepository subscriptionRepo, CustomerService customerService,
