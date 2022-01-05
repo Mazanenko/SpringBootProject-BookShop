@@ -76,7 +76,7 @@ public class CartServiceImpl implements CartService {
         } else {
             orderService.incrementOrderQuantity(orderFromDatabase);
         }
-        bookService.decrementBookQuantity(order.getBook().getId());
+        bookService.decrementBookQuantity(order.getBook());
     }
 
     @Override
@@ -123,7 +123,7 @@ public class CartServiceImpl implements CartService {
 
         for (Order order : cart.getOrderList()) {
             if (order.getBook().getId().equals(productId)) {
-                bookService.decrementBookQuantity(bookService.getBookById(productId).getId());
+                bookService.decrementBookQuantity(bookService.getBookById(productId));
                 orderService.incrementOrderQuantity(order);
             }
         }
@@ -139,7 +139,7 @@ public class CartServiceImpl implements CartService {
         cart.getOrderList().forEach(order -> {
             if (order.getBook().getId().equals(productId)) {
                 orderService.decrementOrderQuantity(order);
-                bookService.incrementBookQuantity(bookService.getBookById(productId).getId());
+                bookService.incrementBookQuantity(bookService.getBookById(productId));
             }
         });
     }

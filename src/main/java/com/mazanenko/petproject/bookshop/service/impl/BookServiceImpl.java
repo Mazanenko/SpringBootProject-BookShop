@@ -18,10 +18,13 @@ import java.util.List;
 
 @Service
 public class BookServiceImpl implements BookService {
-    private final BookRepository bookRepository;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private BookRepository bookRepository;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(BookServiceImpl.class);
+
+    public BookServiceImpl() {
+    }
 
     @Autowired
     public BookServiceImpl(BookRepository bookRepository,
@@ -99,45 +102,35 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void incrementBookQuantity(Long bookId) {
-        if (bookId <= 0) {
-            return;
-        }
-
-        Book book = getBookById(bookId);
-        if (book == null) {
+    public void incrementBookQuantity(Book book) {
+        if (book == null || book.getId() <= 0) {
             return;
         }
 
         int quantity = book.getAvailableQuantity();
         book.setAvailableQuantity(++quantity);
-        updateBookById(bookId, book);
+        bookRepository.save(book);
 
         LOGGER.info("Increment quantity. New available quantity for the book {} by {} with ID {} is {}",
-                book.getName(), book.getAuthor(), bookId, book.getAvailableQuantity());
+                book.getName(), book.getAuthor(), book.getId(), book.getAvailableQuantity());
     }
 
     @Override
     @LogException
-    public void decrementBookQuantity(Long bookId) throws SQLException {
-        if (bookId <= 0) {
+    public void decrementBookQuantity(Book book) throws SQLException {
+        if (book == null || book.getId() <= 0) {
             return;
         }
-
-        Book book = getBookById(bookId);
-        if (book == null) {
-            return;
-        }
-
         int quantity = book.getAvailableQuantity();
 
         if (quantity >= 1) {
             book.setAvailableQuantity(--quantity);
-            updateBookById(bookId, book);
+            bookRepository.save(book);
 
             LOGGER.info("Decrement quantity. New available quantity for the book {} by {} with ID {} is {}",
-                    book.getName(), book.getAuthor(), bookId, book.getAvailableQuantity());
-        } else throw new SQLException();
+                    book.getName(), book.getAuthor(), book.getId(), book.getAvailableQuantity());
+
+        } else throw new SQLException("Can't decrement quantity, because available quantity is less than one");
     }
 
     @Override

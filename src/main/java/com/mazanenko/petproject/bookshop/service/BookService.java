@@ -16,9 +16,9 @@ public interface BookService {
 
     void setQuantity(Long bookId, int newQuantity);
 
-    void incrementBookQuantity(Long bookId);
+    void incrementBookQuantity(Book book);
 
-    void decrementBookQuantity(Long bookId) throws SQLException;
+    void decrementBookQuantity(Book book) throws SQLException;
 
     void deleteBookById(Long bookId);
 
