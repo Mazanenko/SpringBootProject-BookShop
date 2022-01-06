@@ -2,8 +2,8 @@ package com.mazanenko.petproject.bookshop.service.impl;
 
 import com.mazanenko.petproject.bookshop.entity.Book;
 import com.mazanenko.petproject.bookshop.entity.Customer;
-import com.mazanenko.petproject.bookshop.entity.event.CustomerSubscriptionEvent;
 import com.mazanenko.petproject.bookshop.entity.Subscription;
+import com.mazanenko.petproject.bookshop.entity.event.CustomerSubscriptionEvent;
 import com.mazanenko.petproject.bookshop.repository.SubscriptionRepository;
 import com.mazanenko.petproject.bookshop.service.BookService;
 import com.mazanenko.petproject.bookshop.service.CustomerService;
@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Locale;
 
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
@@ -102,7 +104,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (name == null || customerEmail == null || productId <= 0) {
             return;
         }
-        applicationEventPublisher.publishEvent(new CustomerSubscriptionEvent(name, customerEmail, productId));
+        if (name.toLowerCase(Locale.ROOT).equals("subscribed") ||
+                name.toLowerCase(Locale.ROOT).equals("unsubscribed")) {
+            applicationEventPublisher.publishEvent(new CustomerSubscriptionEvent(name, customerEmail, productId));
+        }
     }
 
     private Subscription getSubscriptionByBookId(Long bookId, Customer customer) {

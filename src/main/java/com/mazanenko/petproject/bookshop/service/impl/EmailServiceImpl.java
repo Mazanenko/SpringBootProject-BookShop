@@ -22,19 +22,23 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    private final JavaMailSender javaMailSender;
-    private final CustomerService customerService;
-    private final ManagerService managerService;
-    private final BookService bookService;
+    private JavaMailSender javaMailSender;
+    private CustomerService customerService;
+    private ManagerService managerService;
+    private BookService bookService;
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     @Value("${spring.mail.username}")
     private String username;
+
+    public EmailServiceImpl() {
+    }
 
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender, CustomerService customerService,
@@ -47,6 +51,9 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendSimpleMessage(String to, String subject, String text) {
+        if (to == null) {
+            return;
+        }
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(username);
         message.setTo(to);
@@ -91,21 +98,29 @@ public class EmailServiceImpl implements EmailService {
             return;
         }
 
-        switch (event.getName()) {
+        switch (event.getName().toLowerCase(Locale.ROOT)) {
             case "subscribed":
                 sendSimpleMessage(event.getCustomerEmail(), "Subscription",
                         String.format("Hi! You will be notified when the book \"%s\" by %s arrives at the warehouse.",
                                 book.getName(), book.getAuthor()));
+
+                LOGGER.info("sent message about subscription event for book {} by {} to customer email {}",
+                        book.getName(), book.getAuthor(), event.getCustomerEmail());
                 break;
 
             case "unsubscribed":
-                sendSimpleMessage(event.getCustomerEmail(), "Subscription",
+                sendSimpleMessage(event.getCustomerEmail(), "Unsubscription",
                         String.format("Hi! You have opted out of receiving notifications of arrival " +
                                 "of book \"%s\" by %s at the warehouse.", book.getName(), book.getAuthor()));
+
+                LOGGER.info("sent message about unsubscription event for book {} by {} to customer email {}",
+                        book.getName(), book.getAuthor(), event.getCustomerEmail());
                 break;
+
+            default: LOGGER.warn("Can't send message about subscription event for book ({} by {}) to customer (email {}), " +
+                            "because of illegal argument in event's name ({})", book.getName(),
+                    book.getAuthor(), event.getCustomerEmail(), event.getName());
         }
-        LOGGER.info("sent message about subscription event for book {} by {} to customer email {}", book.getName(),
-                book.getAuthor(), event.getCustomerEmail());
     }
 
     @Async
@@ -115,9 +130,9 @@ public class EmailServiceImpl implements EmailService {
         if (event == null) {
             return;
         }
-        List<Subscription> subscribersList = event.getBook().getSubscribersList();
+        List<Subscription> subscriptions = event.getBook().getSubscribersList();
 
-        subscribersList.forEach(subscriber -> {
+        subscriptions.forEach(subscriber -> {
             Customer customer = customerService.getCustomerById(subscriber.getCustomer().getId());
             sendSimpleMessage(customer.getEmail(), "New arrival",
                     String.format("Hi! We are glad to tell you, that a book \"%s\" by %s is available to order now.",
@@ -143,8 +158,8 @@ public class EmailServiceImpl implements EmailService {
         List<Manager> managerList = managerService.getAllManagers();
 
         // filling list of orders
-        cart.getOrderList().forEach(order -> orderList.add(i.incrementAndGet() + ". " + order.getBook().getName() + " by " +
-                order.getBook().getAuthor() + " - " + order.getQuantity() + " pc."));
+        cart.getOrderList().forEach(order -> orderList.add(i.incrementAndGet() + ". " + order.getBook().getName() +
+                " by " + order.getBook().getAuthor() + " - " + order.getQuantity() + " pc."));
 
         String messageForCustomer = createMessageAboutOrderEventForCustomer(orderList);
         String messageForManager = createMessageAboutOrderEventForManager(customer, orderList);
@@ -155,7 +170,7 @@ public class EmailServiceImpl implements EmailService {
         // sending message to managers
         if(managerList != null) {
             managerList.forEach(manager -> sendSimpleMessage(manager.getEmail(),
-                    "Alarm! New order.", messageForManager));
+                    "Alarm! New order", messageForManager));
         }
         LOGGER.info("Sent message about customer with email {} made an order {}", customer.getEmail(),
                 orderList);

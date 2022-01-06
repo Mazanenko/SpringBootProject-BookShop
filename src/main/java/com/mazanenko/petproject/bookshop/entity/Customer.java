@@ -40,7 +40,7 @@ public class Customer extends Person {
 
     public Customer(Long id, String name, String surname, String gender, String phone, String email, String password
             , DeliveryAddress deliveryAddress, Cart cart) {
-        super(id, name, email, surname, password, "ROLE_CUSTOMER");
+        super(id, name, surname, email, password, "ROLE_CUSTOMER");
         this.gender = gender;
         this.phone = phone;
         this.deliveryAddress = deliveryAddress;
