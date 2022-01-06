@@ -8,21 +8,21 @@ public interface OrderService {
 
     void createOrder(Order order);
 
-    Order readOrder(int id);
+    Order readOrder(Long orderId);
 
-    Order readOrderByCartIdAndProductId(int cartId, int productId);
+    Order readOrderByCartIdAndProductId(Long cartId, Long productId);
 
     List<Order> readAllOrders();
 
-    List<Order> readALLOrdersByCartId(int cartId);
+    List<Order> readALLOrdersByCartId(Long cartId);
 
-    void updateOrder(int id, Order order);
+    void updateOrder(Order updatedOrder);
 
-    void incrementOrderQuantity(int orderId);
+    void incrementOrderQuantity(Order order);
 
-    void decrementOrderQuantity(int orderId);
+    void decrementOrderQuantity(Order order);
 
-    void deleteOrder(int id);
+    void deleteOrder(Order order);
 
-    void deleteAllOrdersByCartId(int cartId);
+    void deleteAllOrdersByCartId(Long cartId);
 }

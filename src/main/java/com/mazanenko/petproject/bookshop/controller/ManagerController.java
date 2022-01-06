@@ -31,7 +31,7 @@ public class ManagerController {
 
     @GetMapping("/{id}")
     @Secured("ROLE_ADMIN")
-    public String showManager(@PathVariable("id") int id, Model model) {
+    public String showManager(@PathVariable("id") Long id, Model model) {
         model.addAttribute("manager", managerService.getManagerById(id));
         return "/people/managers/show-manager";
     }
@@ -69,17 +69,16 @@ public class ManagerController {
 
 
     @GetMapping("/{id}/edit")
-    public String editManager(@PathVariable("id") int id, Model model) {
+    public String editManager(@PathVariable("id") Long id, Model model) {
         model.addAttribute("manager", managerService.getManagerById(id));
         return "/people/managers/edit-manager";
     }
 
     @PatchMapping("/{id}")
     public String updateManager(@ModelAttribute("manager") @Valid Manager manager, BindingResult bindingResult
-            , @PathVariable("id") int id, Model model) {
+            , @PathVariable("id") Long id, Model model) {
 
         if (bindingResult.hasErrors() && !bindingResult.hasFieldErrors("email")) {
-            System.out.println(bindingResult.getAllErrors());
             return "/people/managers/edit-manager";
         } else {
             try {
@@ -94,7 +93,7 @@ public class ManagerController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteManager(@PathVariable("id") int id, Model model) {
+    public String deleteManager(@PathVariable("id") Long id, Model model) {
         try {
             managerService.deleteManagerById(id);
         } catch (Exception e) {

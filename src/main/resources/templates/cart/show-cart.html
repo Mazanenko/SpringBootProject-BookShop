@@ -23,7 +23,7 @@
 <div th:unless="${cart == null}" style="overflow-x:auto;">
     <div th:if="${cart.getOrderList().isEmpty()}">No orders yet.</div>
 
-    <div name="orders_table" th:unless="${cart.getOrderList().isEmpty()}">
+    <div id="orders_table" th:unless="${cart.getOrderList().isEmpty()}">
         <table>
             <thead>
             <tr>
@@ -39,9 +39,9 @@
             <tbody>
             <tr th:each="order : ${cart.getSortedOrderList()}">
 
-                <td hidden="hidden"><span th:text="${order.getProductId()}"> product id </span></td>
+                <td hidden="hidden"><span th:text="${order.getBook().getId()}"> product id </span></td>
 
-                <td><a th:href="@{/books/{id}(id=${order.getProductId()})}">
+                <td><a th:href="@{/books/{id}(id=${order.getBook().getId()})}">
                     <span th:text="${order.getBook().getName()}"> name </span></a></td>
 
                 <td><span th:text="${order.getBook().getAuthor()}"> author </span></td>
@@ -49,22 +49,22 @@
                 <td style="text-align: center">
                     <div>
                         <form sec:authorize="hasRole('CUSTOMER')" th:method="PATCH"
-                              th:action="@{/cart/increment-{bookId}(bookId=${order.getProductId()})}">
+                              th:action="@{/cart/increment-{bookId}(bookId=${order.getBook().getId()})}">
                             <button>&#708;</button>
                         </form>
                         <form sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" th:method="PATCH"
-                              th:action="@{/cart/{customerId}/increment-{bookId}(customerId=${cart.getCustomerId()}, bookId=${order.getProductId()})}">
+                              th:action="@{/cart/{customerId}/increment-{bookId}(customerId=${cart.getCustomer().getId()}, bookId=${order.getBook().getId()})}">
                             <button>&#708;</button>
                         </form>
 
                         <h3 th:text="${order.getQuantity()}"> quantity</h3>
 
                         <form sec:authorize="hasRole('CUSTOMER')" th:method="PATCH"
-                              th:action="@{/cart/decrement-{bookId}(bookId=${order.getProductId()})}">
+                              th:action="@{/cart/decrement-{bookId}(bookId=${order.getBook().getId()})}">
                             <button>&#709;</button>
                         </form>
                         <form sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" th:method="PATCH"
-                              th:action="@{/cart/{customerId}/decrement-{bookId}(customerId=${cart.getCustomerId()}, bookId=${order.getProductId()})}">
+                              th:action="@{/cart/{customerId}/decrement-{bookId}(customerId=${cart.getCustomer().getId()}, bookId=${order.getBook().getId()})}">
                             <button>&#709;</button>
                         </form>
                     </div>
@@ -72,11 +72,11 @@
 
                 <td>
                     <form sec:authorize="hasRole('CUSTOMER')" th:method="DELETE"
-                          th:action="@{/cart/delete-{bookId}(bookId=${order.getProductId()})}">
+                          th:action="@{/cart/delete-{bookId}(bookId=${order.getBook().getId()})}">
                         <button style="padding:  10px 20px;" class="btn danger">Delete</button>
                     </form>
                     <form sec:authorize="hasAnyRole('ADMIN', 'MANAGER')" th:method="DELETE"
-                          th:action="@{/cart/{id}/delete-{bookId}(id=${cart.getCustomerId()}, bookId=${order.getProductId()})}">
+                          th:action="@{/cart/{id}/delete-{bookId}(id=${cart.getCustomer().getId()}, bookId=${order.getBook().getId()})}">
                         <button style="padding:  10px 20px;" class="btn danger">Delete</button>
                     </form>
                 </td>
@@ -84,7 +84,7 @@
             </tbody>
         </table>
         <br/>
-        <div name="make-an-order-btn" sec:authorize="hasRole('CUSTOMER')">
+        <div id="make-an-order-btn" sec:authorize="hasRole('CUSTOMER')">
             <form th:method="PATCH" th:action="@{/cart/order}">
                 <button style="padding:  10px 20px;" class="btn success">Make an order</button>
             </form>
@@ -99,7 +99,7 @@
             <script th:inline="javascript" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
                 window.alert('This is maximum quantity we have at this moment for this book!\n' +
                     'Please, come back later to buy more.');
-                window.location.href = "/cart/" + [[${cart.getCustomerId()}]];
+                window.location.href = "/cart/" + [[${cart.getCustomer().getId()}]];
             </script>
         </div>
 

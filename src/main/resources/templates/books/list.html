@@ -53,7 +53,7 @@
         <td sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')"
             th:if="${book.getAvailableQuantity() > 0 and cart != null}">
             <form th:method="POST"
-                  th:action="@{/cart/{customerId}/add-{bookId}(bookId=${book.getId()}, customerId=${cart.getCustomerId()})}">
+                  th:action="@{/cart/{customerId}/add-{bookId}(bookId=${book.getId()}, customerId=${cart.getCustomer().getId()})}">
                 <button style="padding:  10px 20px;" class="btn success">Add to cart</button>
             </form>
         </td>

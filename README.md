@@ -15,6 +15,7 @@ This app based on:
 - java 11
 - spring-boot 2.5.4
 - spring security
+- spring data JPA
 - postgreSQL
 - Flyway
 - Thymeleaf

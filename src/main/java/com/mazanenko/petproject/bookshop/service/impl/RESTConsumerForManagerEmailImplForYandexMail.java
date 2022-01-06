@@ -3,6 +3,8 @@ package com.mazanenko.petproject.bookshop.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mazanenko.petproject.bookshop.annotation.LogException;
+import com.mazanenko.petproject.bookshop.annotation.LogExecutionTime;
 import com.mazanenko.petproject.bookshop.service.RESTConsumerForManagerEmail;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,9 @@ public class RESTConsumerForManagerEmailImplForYandexMail implements RESTConsume
     }
 
     @Override
-    public void createEmail(String email, String password) throws Exception {
+    @LogException
+    @LogExecutionTime
+    public boolean createEmail(String email, String password) throws Exception {
         if (email == null || password == null) {
             throw new Exception("Email or password is null");
         }
@@ -39,20 +43,25 @@ public class RESTConsumerForManagerEmailImplForYandexMail implements RESTConsume
         String encodedURL = encodeURL(param, "/api2/admin/email/add");
         String response = restTemplate.postForObject(encodedURL, entity, String.class);
 
-        try {
-            Map<String, String> map = objectMapper.readValue(response, new TypeReference<>() {});
+        Map<String, String> responseMap = new HashMap<>();
 
-            if (map.get("success").equals("error")) {
+        try {
+            responseMap = objectMapper.readValue(response, new TypeReference<>() {});
+
+            if (responseMap.get("success").equals("error")) {
                 throw new Exception("Error while trying registered email " + email
-                        + "\n" + "Error code: " + map.get("error"));
+                        + "\n" + "Error code: " + responseMap.get("error"));
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
+        return responseMap.get("success").equals("ok");
     }
 
     @Override
-    public void changePassword(String email, String newPassword) throws Exception {
+    @LogException
+    @LogExecutionTime
+    public boolean changePassword(String email, String newPassword) throws Exception {
         if (email == null || newPassword == null) {
             throw new Exception("Email or new password is null");
         }
@@ -61,19 +70,24 @@ public class RESTConsumerForManagerEmailImplForYandexMail implements RESTConsume
         String encodedURL = encodeURL(param, "/api2/admin/email/edit");
         String response = restTemplate.postForObject(encodedURL, entity, String.class);
 
-        try {
-            Map<String, Object> map = objectMapper.readValue(response, new TypeReference<>() {});
+        Map<String, Object> responseMap = new HashMap<>();
 
-            if (map.get("success").equals("error")) {
+        try {
+            responseMap = objectMapper.readValue(response, new TypeReference<>() {});
+
+            if (responseMap.get("success").equals("error")) {
                 throw new Exception("Error while trying to change password for email " + email
-                        + "\n" + "Error code: " + map.get("error"));
+                        + "\n" + "Error code: " + responseMap.get("error"));
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
+        return responseMap.get("success").equals("ok");
     }
 
     @Override
+    @LogException
+    @LogExecutionTime
     public void deleteEmail(String email) throws Exception {
         if (email == null) {
             throw new Exception("Email is null");

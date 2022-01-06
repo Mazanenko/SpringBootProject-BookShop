@@ -35,7 +35,7 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public String showBook(@PathVariable("id") int id, ModelMap model, Principal principal) {
+    public String showBook(@PathVariable("id") Long id, ModelMap model, Principal principal) {
         Book book = bookService.getBookById(id);
         model.addAttribute("book", book);
 
@@ -64,14 +64,14 @@ public class BookController {
 
 
     @GetMapping("/{id}/edit-book")
-    public String editBook(@PathVariable("id") int id, Model model) {
+    public String editBook(@PathVariable("id") Long id, Model model) {
         model.addAttribute("book", bookService.getBookById(id));
         return "books/edit-book";
     }
 
     @PatchMapping("/{id}")
     public String updateBook(@ModelAttribute("book") @Valid Book book, BindingResult bindingResult,
-                             @PathVariable("id") int id) {
+                             @PathVariable("id") Long id) {
         if (bindingResult.hasErrors()) {
             return "books/edit-book";
         } else {
@@ -82,19 +82,19 @@ public class BookController {
 
 
     @DeleteMapping("/{id}")
-    public String deleteBook(@PathVariable("id") int id) {
+    public String deleteBook(@PathVariable("id") Long id) {
         bookService.deleteBookById(id);
         return "redirect:/books";
     }
 
     @PostMapping("/subscribe-{bookId}")
-    public String subscribeToArrival(@PathVariable("bookId") int bookId, Principal principal) {
+    public String subscribeToArrival(@PathVariable("bookId") Long bookId, Principal principal) {
         subscriptionService.subscribeByCustomerEmail(bookId, principal.getName());
         return String.format("redirect:/books/%s", bookId);
     }
 
     @PostMapping("/unsubscribe-{bookId}")
-    public String unsubscribeToArrival(@PathVariable("bookId") int bookId, Principal principal) {
+    public String unsubscribeToArrival(@PathVariable("bookId") Long bookId, Principal principal) {
         subscriptionService.unsubscribeByCustomerEmail(bookId, principal.getName());
         return String.format("redirect:/books/%s", bookId);
     }

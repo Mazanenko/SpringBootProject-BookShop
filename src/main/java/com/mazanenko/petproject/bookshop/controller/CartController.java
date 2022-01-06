@@ -27,7 +27,7 @@ public class CartController {
 
     @GetMapping("/{customerId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String showCart(@PathVariable("customerId") int customerId, Model model) {
+    public String showCart(@PathVariable("customerId") Long customerId, Model model) {
         model.addAttribute("cart", cartService.getCartByCustomerId(customerId));
         return "/cart/show-cart";
     }
@@ -35,14 +35,13 @@ public class CartController {
     @GetMapping()
     @Secured("ROLE_CUSTOMER")
     public String showCartForCustomer(Principal principal, ModelMap model) {
-        Cart cart = cartService.getCartByCustomerEmail(principal.getName());
-        model.addAttribute("cart", cart);
+        model.addAttribute("cart", cartService.getCartByCustomerEmail(principal.getName()));
         return "/cart/show-cart";
     }
 
     @GetMapping("/{cartId}-add-book")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String addBookToCustomer(@PathVariable("cartId") int cartId, ModelMap model) {
+    public String addBookToCustomer(@PathVariable("cartId") Long cartId, ModelMap model) {
         model.addAttribute("books", bookService.getAllBooks());
         model.addAttribute("cart", cartService.getCartById(cartId));
         return "/books/list";
@@ -50,8 +49,8 @@ public class CartController {
 
     @PostMapping("/{customerId}/add-{bookId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String addToCartForManager(@PathVariable("bookId") int bookId,
-                                      @PathVariable("customerId") int customerId) {
+    public String addToCartForManager(@PathVariable("bookId") Long bookId,
+                                      @PathVariable("customerId") Long customerId) {
 
         try {
             cartService.addToCartByCustomerId(customerId, bookId);
@@ -64,7 +63,7 @@ public class CartController {
 
     @PostMapping("/add-{bookId}")
     @Secured("ROLE_CUSTOMER")
-    public String addToCartForCustomer(@PathVariable("bookId") int bookId, Principal principal) {
+    public String addToCartForCustomer(@PathVariable("bookId") Long bookId, Principal principal) {
 
         if (bookService.isBookAvailable(bookId)) {
             try {
@@ -79,7 +78,7 @@ public class CartController {
 
     @PatchMapping("/increment-{bookId}")
     @Secured("ROLE_CUSTOMER")
-    public String incrementProductForCustomer(@PathVariable("bookId") int bookId, Principal principal,
+    public String incrementProductForCustomer(@PathVariable("bookId") Long bookId, Principal principal,
                                               ModelMap modelMap) {
 
         Cart cart = cartService.getCartByCustomerEmail(principal.getName());
@@ -97,8 +96,8 @@ public class CartController {
 
     @PatchMapping("/{customerId}/increment-{bookId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String incrementProductForManager(@PathVariable("bookId") int bookId,
-                                             @PathVariable("customerId") int customerId, ModelMap modelMap) {
+    public String incrementProductForManager(@PathVariable("bookId") Long bookId,
+                                             @PathVariable("customerId") Long customerId, ModelMap modelMap) {
 
         Cart cart = cartService.getCartByCustomerId(customerId);
 
@@ -115,7 +114,7 @@ public class CartController {
 
     @PatchMapping("/decrement-{bookId}")
     @Secured("ROLE_CUSTOMER")
-    public String decrementProductForCustomer(@PathVariable("bookId") int bookId, Principal principal) {
+    public String decrementProductForCustomer(@PathVariable("bookId") Long bookId, Principal principal) {
 
         Cart cart = cartService.getCartByCustomerEmail(principal.getName());
         cartService.decrementProduct(bookId, cart);
@@ -124,8 +123,8 @@ public class CartController {
 
     @PatchMapping("/{customerId}/decrement-{bookId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String decrementProductForManager(@PathVariable("bookId") int bookId,
-                                             @PathVariable("customerId") int customerId) {
+    public String decrementProductForManager(@PathVariable("bookId") Long bookId,
+                                             @PathVariable("customerId") Long customerId) {
 
         Cart cart = cartService.getCartByCustomerId(customerId);
         cartService.decrementProduct(bookId, cart);
@@ -134,7 +133,7 @@ public class CartController {
 
     @DeleteMapping("/delete-{bookId}")
     @Secured("ROLE_CUSTOMER")
-    public String deleteFromCartForCustomer(@PathVariable("bookId") int bookId, Principal principal) {
+    public String deleteFromCartForCustomer(@PathVariable("bookId") Long bookId, Principal principal) {
         Cart cart = cartService.getCartByCustomerEmail(principal.getName());
         cartService.deleteOrderFromCart(bookId, cart);
         return "redirect:/cart";
@@ -142,8 +141,8 @@ public class CartController {
 
     @DeleteMapping("/{customerId}/delete-{bookId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String deleteFromCartForManager(@PathVariable("customerId") int customerId,
-                                           @PathVariable("bookId") int bookId) {
+    public String deleteFromCartForManager(@PathVariable("customerId") Long customerId,
+                                           @PathVariable("bookId") Long bookId) {
 
         Cart cart = cartService.getCartByCustomerId(customerId);
         cartService.deleteOrderFromCart(bookId, cart);

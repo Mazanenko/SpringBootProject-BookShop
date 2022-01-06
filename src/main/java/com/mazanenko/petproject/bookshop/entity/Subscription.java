@@ -1,30 +1,55 @@
 package com.mazanenko.petproject.bookshop.entity;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "subscription")
 public class Subscription {
-    private int productId;
-    private int customerId;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Book book;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     public Subscription() {
     }
 
-    public Subscription(int productId, int customerId) {
-        this.productId = productId;
-        this.customerId = customerId;
+    public Subscription(Book book, Customer customer) {
+        this.book = book;
+        this.customer = customer;
     }
 
-    public int getProductId() {
-        return productId;
+    public Long getId() {
+        return id;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public int getCustomerId() {
-        return customerId;
+    public Book getBook() {
+        return book;
     }
 
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
+    public void setBook(Book book) {
+        this.book = book;
     }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+
 }

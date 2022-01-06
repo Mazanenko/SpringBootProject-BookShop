@@ -1,45 +1,43 @@
 package com.mazanenko.petproject.bookshop.entity;
 
+import javax.persistence.*;
+import java.util.Objects;
 
+@Entity
+@Table(name = "order_table")
 public class Order {
-    private int id;
-    private int cartId;
-    private int productId;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "quantity")
     private int quantity;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private Book book;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 
     public Order() {
     }
 
-    public Order(int cartId, int productId, int quantity) {
-        this.cartId = cartId;
-        this.productId = productId;
+    public Order(Cart cart, Book book, int quantity) {
+        this.cart = cart;
+        this.book = book;
         this.quantity = quantity;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public int getCartId() {
-        return cartId;
-    }
-
-    public void setCartId(int cartId) {
-        this.cartId = cartId;
-    }
-
-    public int getProductId() {
-        return productId;
-    }
-
-    public void setProductId(int productId) {
-        this.productId = productId;
     }
 
     public int getQuantity() {
@@ -58,12 +56,33 @@ public class Order {
         this.book = book;
     }
 
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
-                "cartId=" + getCartId() +
-                ", productId=" + getProductId() +
+                "cartId=" + cart.getId() +
+                ", bookId=" + book.getId() +
                 ", product quantity=" + getQuantity() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Order order = (Order) o;
+        return quantity == order.quantity && id.equals(order.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, quantity);
     }
 }

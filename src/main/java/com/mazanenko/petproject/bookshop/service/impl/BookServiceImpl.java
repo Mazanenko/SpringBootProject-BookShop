@@ -1,103 +1,163 @@
 package com.mazanenko.petproject.bookshop.service.impl;
 
-import com.mazanenko.petproject.bookshop.dao.BookDAO;
+import com.mazanenko.petproject.bookshop.annotation.LogException;
 import com.mazanenko.petproject.bookshop.entity.Book;
 import com.mazanenko.petproject.bookshop.entity.event.ProductArrivalEvent;
+import com.mazanenko.petproject.bookshop.repository.BookRepository;
 import com.mazanenko.petproject.bookshop.service.BookService;
-import com.mazanenko.petproject.bookshop.service.SubscriptionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BookServiceImpl implements BookService {
-    private final BookDAO bookDAO;
-    private final SubscriptionService subscriptionService;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private BookRepository bookRepository;
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(BookServiceImpl.class);
+
+    public BookServiceImpl() {
+    }
 
     @Autowired
-    public BookServiceImpl(BookDAO bookDAO, SubscriptionService subscriptionService,
+    public BookServiceImpl(BookRepository bookRepository,
                            ApplicationEventPublisher applicationEventPublisher) {
 
-        this.bookDAO = bookDAO;
-        this.subscriptionService = subscriptionService;
+        this.bookRepository = bookRepository;
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
     public void createBook(Book book) {
-        bookDAO.create(book);
-    }
-
-    @Override
-    public Book getBookById(int id) {
-        Book book = bookDAO.read(id);
-        book.setSubscribersList(subscriptionService.listOfSubscribers(id));
-        return book;
-    }
-
-    @Override
-    public List<Book> getAllBooks() {
-        return bookDAO.readAll().stream().sorted(Comparator.comparing(Book::getName)).collect(Collectors.toList());
-    }
-
-    @Override
-    public void updateBookById(int id, Book updatedBook) {
-        if (bookDAO.read(id).getAvailableQuantity() == 0 && updatedBook.getAvailableQuantity() > 0) {
-            publishArrivalEvent(id);
+        if (book == null) {
+            return;
         }
-        bookDAO.update(id, updatedBook);
+        bookRepository.save(book);
+
+        LOGGER.info("The book {} was created", book);
     }
 
     @Override
-    public void setQuantity(int bookId, int newQuantity) {
-        if (bookDAO.read(bookId).getAvailableQuantity() == 0 && newQuantity > 0) {
+    public Book getBookById(Long bookId) {
+        if (bookId == null) {
+            return null;
+        }
+        return bookRepository.findById(bookId).orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
+    }
+
+    @Override
+    @Transactional
+    public void updateBookById(Long bookId, Book updatedBook) {
+        if (bookId <= 0 || updatedBook == null) {
+            return;
+        }
+
+        Book originalBook = getBookById(bookId);
+        if (originalBook == null) {
+            return;
+        }
+
+        if (originalBook.getAvailableQuantity() == 0 && updatedBook.getAvailableQuantity() > 0) {
             publishArrivalEvent(bookId);
         }
-        bookDAO.updateQuantity(bookId, newQuantity);
+        updatedBook.setId(bookId);
+        bookRepository.save(updatedBook);
+
+        LOGGER.info("The book {} by {} with ID {} wos updated. Now it is {}",
+                originalBook.getName(), originalBook.getAuthor(), bookId, updatedBook);
     }
 
     @Override
-    public void incrementBookQuantity(int bookId) {
-        Book book = getBookById(bookId);
-        if (book != null) {
-            int quantity = book.getAvailableQuantity();
-            book.setAvailableQuantity(++quantity);
-            updateBookById(bookId, book);
+    public void setQuantity(Long bookId, int newQuantity) {
+        if (bookId <= 0 || newQuantity < 0) {
+            return;
         }
-    }
 
-    @Override
-    public void decrementBookQuantity(int bookId) throws SQLException {
         Book book = getBookById(bookId);
-        if (book != null) {
-            int quantity = book.getAvailableQuantity();
-
-            if (quantity >= 1) {
-                book.setAvailableQuantity(--quantity);
-                updateBookById(bookId, book);
-            } else throw new SQLException();
+        if (book == null) {
+            return;
         }
+
+        if (book.getAvailableQuantity() == 0 && newQuantity > 0) {
+            publishArrivalEvent(bookId);
+        }
+        book.setAvailableQuantity(newQuantity);
+        bookRepository.save(book);
+
+        LOGGER.info("New available quantity for the book {} by {} with ID {} is {}",
+                book.getName(), book.getAuthor(), bookId, newQuantity);
     }
 
     @Override
-    public void deleteBookById(int id) {
-        bookDAO.delete(id);
+    public void incrementBookQuantity(Book book) {
+        if (book == null || book.getId() <= 0) {
+            return;
+        }
+
+        int quantity = book.getAvailableQuantity();
+        book.setAvailableQuantity(++quantity);
+        bookRepository.save(book);
+
+        LOGGER.info("Increment quantity. New available quantity for the book {} by {} with ID {} is {}",
+                book.getName(), book.getAuthor(), book.getId(), book.getAvailableQuantity());
     }
 
     @Override
-    public boolean isBookAvailable(int bookId) {
+    @LogException
+    public void decrementBookQuantity(Book book) throws SQLException {
+        if (book == null || book.getId() <= 0) {
+            return;
+        }
+        int quantity = book.getAvailableQuantity();
+
+        if (quantity >= 1) {
+            book.setAvailableQuantity(--quantity);
+            bookRepository.save(book);
+
+            LOGGER.info("Decrement quantity. New available quantity for the book {} by {} with ID {} is {}",
+                    book.getName(), book.getAuthor(), book.getId(), book.getAvailableQuantity());
+
+        } else throw new SQLException("Can't decrement quantity, because available quantity is less than one");
+    }
+
+    @Override
+    public void deleteBookById(Long bookId) {
+        if (bookId <= 0) {
+            return;
+        }
+        bookRepository.deleteById(bookId);
+
+        LOGGER.info("The book with ID {} was deleted", bookId);
+    }
+
+    @Override
+    public boolean isBookAvailable(Long bookId) {
+        if (bookId <= 0) {
+            return false;
+        }
+
         Book book = getBookById(bookId);
         return ((book != null) && (book.getAvailableQuantity() > 0));
     }
 
 
-    private void publishArrivalEvent(int productId) {
-        applicationEventPublisher.publishEvent(new ProductArrivalEvent(getBookById(productId)));
+    private void publishArrivalEvent(Long bookId) {
+        if (bookId <= 0) {
+            return;
+        }
+        applicationEventPublisher.publishEvent(new ProductArrivalEvent(getBookById(bookId)));
     }
 }

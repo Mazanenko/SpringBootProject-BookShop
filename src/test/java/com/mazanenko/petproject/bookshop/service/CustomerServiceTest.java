@@ -1,12 +1,7 @@
 package com.mazanenko.petproject.bookshop.service;
 
-import com.mazanenko.petproject.bookshop.dao.CartDAO;
-import com.mazanenko.petproject.bookshop.dao.CustomerDAO;
-import com.mazanenko.petproject.bookshop.dao.DeliveryAddressDAO;
-import com.mazanenko.petproject.bookshop.entity.Book;
-import com.mazanenko.petproject.bookshop.entity.Cart;
-import com.mazanenko.petproject.bookshop.entity.Customer;
-import com.mazanenko.petproject.bookshop.entity.DeliveryAddress;
+import com.mazanenko.petproject.bookshop.entity.*;
+import com.mazanenko.petproject.bookshop.repository.CustomerRepository;
 import com.mazanenko.petproject.bookshop.service.impl.CustomerServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,16 +10,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
-import javax.management.remote.JMXPrincipal;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
-//@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class CustomerServiceTest {
 
@@ -32,220 +28,340 @@ class CustomerServiceTest {
     private CustomerService customerService = new CustomerServiceImpl();
 
     @Mock
-    private CustomerDAO customerDAO;
+    private CustomerRepository customerRepo;
 
     @Mock
-    private DeliveryAddressDAO addressDAO;
-
-    @Mock
-    private CartDAO cartDAO;
+    private CartService cartService;
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
-    private final String email = "test@mail.ru";
-    private final String password = "password";
-    private final int id = 1;
-    private final Customer customer = new Customer();
-    private final DeliveryAddress address = new DeliveryAddress();
-    private final Cart cart = new Cart();
-    private final String activationCode = "code";
+    private final String EMAIL = "test_customer@mail.ru";
+    private final String PASSWORD = "password";
+    private final Long ID = 1L;
+    private final Customer CUSTOMER = new Customer();
+    private final DeliveryAddress ADDRESS = new DeliveryAddress();
+    private final Cart CART = new Cart();
+    private final String ACTIVATION_CODE = "code";
+    private final Book BOOK = new Book();
+    private final Subscription SUBSCRIPTION = new Subscription(BOOK, CUSTOMER);
 
 
     @BeforeEach
     void setUp() {
-        customer.setName("TestCustomer");
-        customer.setId(id);
-        customer.setEmail(email);
-        customer.setPassword(password);
-        customer.setDeliveryAddress(address);
-        customer.setActivationCode(activationCode);
+        ADDRESS.setId(ID);
+
+        CUSTOMER.setName("TestCustomer");
+        CUSTOMER.setId(ID);
+        CUSTOMER.setEmail(EMAIL);
+        CUSTOMER.setPassword(PASSWORD);
+        CUSTOMER.setDeliveryAddress(ADDRESS);
+        CUSTOMER.setActivationCode(ACTIVATION_CODE);
     }
 
 
     @Test
     public void createCustomerShouldCreateNewCustomer() {
+        //Given
+        ADDRESS.setId(CUSTOMER.getId());
 
-        cart.setCustomerId(customer.getId());
+        //When
+        customerService.createCustomer(CUSTOMER, ADDRESS);
 
-        Mockito.doReturn(customer).when(customerDAO).readByEmail(email);
+        ArgumentCaptor<ApplicationEventPublisher> applicationEventPublisherCaptor = ArgumentCaptor
+                .forClass(ApplicationEventPublisher.class);
 
-        customerService.createCustomer(customer, address);
+        //Then
+        Mockito.verify(customerRepo, Mockito.times(1)).save(CUSTOMER);
+        Mockito.verify(applicationEventPublisher, Mockito.times(1))
+                .publishEvent(applicationEventPublisherCaptor.capture());
+    }
 
-        ArgumentCaptor<CartDAO> cartDAOCaptor = ArgumentCaptor.forClass(CartDAO.class);
-        ArgumentCaptor<ApplicationEventPublisher> applicationEventPublisherCaptor =
-                ArgumentCaptor.forClass(ApplicationEventPublisher.class);
+    @Test
+    public void createCustomerWhenCustomerOrAddressIsNull() {
+        //Given customer and address are null
 
-        Mockito.verify(customerDAO, Mockito.times(1)).create(customer);
-        Mockito.verify(addressDAO, Mockito.times(1)).create(address);
-        Mockito.verify(cartDAO, Mockito.times(1)).create((Cart) cartDAOCaptor.capture());
-        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(applicationEventPublisherCaptor.capture());
+        //When
+        customerService.createCustomer(null, null);
+
+        //Then
+        Mockito.verifyNoInteractions(customerRepo);
+        Mockito.verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
     void getCustomerByIdShouldReturnCustomer() {
-        Mockito.doReturn(customer).when(customerDAO).read(id);
+        //Given
+        String role = "ROLE_CUSTOMER";
 
-        Assertions.assertEquals(customer, customerService.getCustomerById(customer.getId()));
+        //When
+        Mockito.when(customerRepo.findById(ID)).thenReturn(Optional.of(CUSTOMER));
 
-        Mockito.verify(addressDAO, Mockito.times(1)).read(id);
-        Mockito.verify(cartDAO, Mockito.times(1)).readByCustomerId(id);
+        //Then
+        Assertions.assertEquals(CUSTOMER, customerService.getCustomerById(ID));
+        Assertions.assertEquals(role, CUSTOMER.getRole());
+
     }
 
     @Test
     void getCustomerByIdShouldReturnNull() {
-        Mockito.doReturn(null).when(customerDAO).read(id);
+        //When customerId is zero or less
 
-        Assertions.assertNull(customerService.getCustomerById(customer.getId()));
+        //Then
+        Assertions.assertNull(customerService.getCustomerById(0L));
+        Mockito.verifyNoInteractions(customerRepo);
+        Assertions.assertNull(CUSTOMER.getRole());
+    }
 
-        Mockito.verifyNoInteractions(addressDAO);
-        Mockito.verifyNoInteractions(cartDAO);
+    @Test
+    void getCustomerByIdShouldReturnNullWhenReturnedCustomerIsNotExist() {
+        //When
+        Mockito.when(customerRepo.findById(ID)).thenReturn(Optional.empty());
+
+        //Then
+        Assertions.assertNull(customerService.getCustomerById(ID));
+        Assertions.assertNull(CUSTOMER.getRole());
     }
 
     @Test
     void getCustomerByEmailShouldReturnCustomer() {
-        Mockito.doReturn(customer).when(customerDAO).readByEmail(email);
+        //Given
+        String role = "ROLE_CUSTOMER";
 
-        Assertions.assertEquals(customer, customerService.getCustomerByEmail(customer.getEmail()));
+        //When
+        Mockito.when(customerRepo.findByEmail(EMAIL)).thenReturn(Optional.of(CUSTOMER));
 
-        Mockito.verify(addressDAO, Mockito.times(1)).read(id);
-        Mockito.verify(cartDAO, Mockito.times(1)).readByCustomerId(id);
+        //Then
+        Assertions.assertEquals(CUSTOMER, customerService.getCustomerByEmail(EMAIL));
+        Assertions.assertEquals(role, CUSTOMER.getRole());
     }
 
     @Test
     void getCustomerByEmailShouldReturnNull() {
-        Mockito.doReturn(null).when(customerDAO).readByEmail(email);
+        //When email is null
 
-        Assertions.assertNull(customerService.getCustomerByEmail(customer.getEmail()));
+        //Then
+        Assertions.assertNull(customerService.getCustomerByEmail(null));
+        Mockito.verifyNoInteractions(customerRepo);
+        Assertions.assertNull(CUSTOMER.getRole());
+    }
 
-        Mockito.verifyNoInteractions(addressDAO);
-        Mockito.verifyNoInteractions(cartDAO);
+    @Test
+    void getCustomerByEmailShouldReturnNullWhenReturnedCustomerIsNotExist() {
+        //When
+        Mockito.when(customerRepo.findByEmail(EMAIL)).thenReturn(Optional.empty());
+
+        //Then
+        Assertions.assertNull(customerService.getCustomerByEmail(EMAIL));
+        Assertions.assertNull(CUSTOMER.getRole());
     }
 
     @Test
     void getAllCustomersShouldReturnSortedListOfCustomers() {
+        //Given
         List<Customer> customers = new ArrayList<>();
         Customer customer2 = new Customer();
 
-        customer2.setName("Customer");
-        customers.add(customer);
+        customer2.setId(2L);
+        customer2.setName("NewCustomer");
+        customers.add(CUSTOMER);
         customers.add(customer2);
 
         List<Customer> sortedList = customers.stream()
                 .sorted(Comparator.comparing(Customer::getId)).collect(Collectors.toList());
 
-        Mockito.doReturn(customers).when(customerDAO).readAll();
+        //When
+        Mockito.when(customerRepo.findAll(Sort.by(Sort.Direction.ASC, "id"))).thenReturn(sortedList);
 
+        //Then
         Assertions.assertEquals(sortedList, customerService.getAllCustomers());
     }
 
     @Test
     void updateCustomerByIdWhenPasswordsMatch() {
+        //Given customer as originalCustomer
+        List<Subscription> list = new ArrayList<>();
+        list.add(SUBSCRIPTION);
+        CUSTOMER.setSubscriptions(list);
+
         Customer updatedCustomer = new Customer();
-        updatedCustomer.setPassword(password);
+        updatedCustomer.setId(2L);
+        updatedCustomer.setPassword(PASSWORD);
         updatedCustomer.setActivated(false);
 
-        Mockito.doReturn(customer).when(customerDAO).read(id);
+        //When
+        Mockito.when(customerRepo.findById(ID)).thenReturn(Optional.of(CUSTOMER));
+        customerService.updateCustomerById(ID, updatedCustomer, ADDRESS);
 
-        customerService.updateCustomerById(id, updatedCustomer, address);
-
+        //Then
         Assertions.assertTrue(updatedCustomer.isActivated());
-        Mockito.verify(customerDAO, Mockito.times(1)).update(id, updatedCustomer);
-        Mockito.verify(addressDAO, Mockito.times(1)).update(id, address);
+        Assertions.assertEquals(PASSWORD, updatedCustomer.getPassword());
+        Mockito.verify(customerRepo, Mockito.times(1)).save(updatedCustomer);
     }
 
     @Test
     void updateCustomerByIdWhenPasswordsDontMatch() {
+        //Given customer as originalCustomer
+        List<Subscription> list = new ArrayList<>();
+        list.add(SUBSCRIPTION);
+        CUSTOMER.setSubscriptions(list);
+
+        String newPass = "newPass";
         Customer updatedCustomer = new Customer();
-        updatedCustomer.setPassword("anotherPassword");
+        updatedCustomer.setId(2L);
+        updatedCustomer.setPassword(newPass);
         updatedCustomer.setActivated(false);
 
-        Mockito.doReturn(customer).when(customerDAO).read(id);
+        //When
+        Mockito.when(customerRepo.findById(ID)).thenReturn(Optional.of(CUSTOMER));
+        customerService.updateCustomerById(ID, updatedCustomer, ADDRESS);
 
-        customerService.updateCustomerById(id, updatedCustomer, address);
-
+        //Then
         Assertions.assertTrue(updatedCustomer.isActivated());
-        Assertions.assertNotEquals("anotherPassword", updatedCustomer.getPassword());
-        Mockito.verify(customerDAO, Mockito.times(1)).update(id, updatedCustomer);
-        Mockito.verify(addressDAO, Mockito.times(1)).update(id, address);
+        Assertions.assertTrue(BCrypt.checkpw(newPass, updatedCustomer.getPassword()));
+        Mockito.verify(customerRepo, Mockito.times(1)).save(updatedCustomer);
     }
 
     @Test
     void deleteCustomerById() {
-        customerService.deleteCustomerById(id);
-        Mockito.verify(customerDAO, Mockito.times(1)).delete(id);
+        //Given customerId >= 0
+        CART.setId(ID);
+        CUSTOMER.setCart(CART);
+
+        //When
+        Mockito.when(customerRepo.findById(ID)).thenReturn(Optional.of(CUSTOMER));
+        customerService.deleteCustomerById(ID);
+
+        //Then
+        Mockito.verify(cartService, Mockito.times(1)).deleteAllOrdersFromCart(CUSTOMER.getCart());
+        Mockito.verify(customerRepo, Mockito.times(1)).deleteById(ID);
     }
 
     @Test
-    void deleteCustomerByIdWhenIdLessThenOne() {
-        customerService.deleteCustomerById(0);
-        Mockito.verifyNoInteractions(cartDAO);
+    void deleteCustomerByIdWhenIdIsZeroOrLess() {
+        //Given
+        Long invalidId = 0L;
+
+        //When
+        customerService.deleteCustomerById(invalidId);
+
+        //Then
+        Mockito.verifyNoInteractions(cartService);
+        Mockito.verifyNoInteractions(customerRepo);
     }
 
     @Test
     void deleteCustomerByEmail() {
-        customerService.deleteCustomerByEmail(email);
-        Mockito.verify(customerDAO, Mockito.times(1)).deleteByEmail(email);
+        //Given
+        CART.setId(ID);
+        CUSTOMER.setCart(CART);
+
+        //When
+        Mockito.when(customerRepo.findByEmail(EMAIL)).thenReturn(Optional.of(CUSTOMER));
+        customerService.deleteCustomerByEmail(EMAIL);
+
+        //Then
+        Mockito.verify(cartService, Mockito.times(1)).deleteAllOrdersFromCart(CUSTOMER.getCart());
+        Mockito.verify(customerRepo, Mockito.times(1)).deleteByEmail(EMAIL);
     }
 
     @Test
     void deleteCustomerByEmailWhenEmailIsNull() {
+        //Given email is null
+        //When
         customerService.deleteCustomerByEmail(null);
-        Mockito.verifyNoInteractions(cartDAO);
+
+        //Then
+        Mockito.verifyNoInteractions(cartService);
+        Mockito.verifyNoInteractions(customerRepo);
     }
 
     @Test
     void activateUserShouldReturnTrue() {
-        Mockito.doReturn(customer).when(customerDAO).readByActivationCode(activationCode);
+        //Given correct activation code
+        //When
+        Mockito.when(customerRepo.findByActivationCode(ACTIVATION_CODE)).thenReturn(Optional.of(CUSTOMER));
 
-        Assertions.assertTrue(customerService.activateUser(activationCode));
-        Assertions.assertNull(customer.getActivationCode());
-        Assertions.assertTrue(customer.isActivated());
-
-        Mockito.verify(customerDAO, Mockito.times(1)).update(id, customer);
+        //Then
+        Assertions.assertTrue(customerService.activateUser(ACTIVATION_CODE));
+        Assertions.assertNull(CUSTOMER.getActivationCode());
+        Assertions.assertTrue(CUSTOMER.isActivated());
+        Mockito.verify(customerRepo, Mockito.times(1)).save(CUSTOMER);
     }
 
     @Test
-    void activateUserShouldReturnFalse() {
-        Mockito.doReturn(null).when(customerDAO).readByActivationCode(activationCode);
-
-        Assertions.assertFalse(customerService.activateUser(activationCode));
-        Assertions.assertEquals(activationCode, customer.getActivationCode());
-        Assertions.assertFalse(customer.isActivated());
-
-        Mockito.verifyNoMoreInteractions(customerDAO);
+    void activateUserShouldReturnFalseWhenActivationCodeIsNull() {
+        //Given activation code is null
+        //Then
+        Assertions.assertFalse(customerService.activateUser(null));
+        Mockito.verifyNoInteractions(customerRepo);
     }
 
     @Test
-    void isSubscribedToArrivalReturnTrue() {
-        Principal principal = new JMXPrincipal(email);
-        Book book = new Book();
-        book.setSubscribersList(new ArrayList<>(List.of(id)));
+    void activateUserShouldReturnFalseWhenActivationCodesDoNotMatch() {
+        //Given invalid activation code
+        String invalidCode = "new activation code";
 
-        Mockito.doReturn(customer).when(customerDAO).readByEmail(email);
+        //When
+        Mockito.when(customerRepo.findByActivationCode(invalidCode)).thenReturn(Optional.empty());
 
-        Assertions.assertTrue(customerService.isSubscribedToArrival(principal, book));
+        //Then
+        Assertions.assertFalse(customerService.activateUser(invalidCode));
+        Mockito.verifyNoMoreInteractions(customerRepo);
+
     }
 
     @Test
-    void isSubscribedToArrivalReturnFalseWhenSubscribersListIsEmpty() {
-        Principal principal = new JMXPrincipal(email);
-        Book book = new Book();
-        book.setSubscribersList(new ArrayList<>());
+    void isSubscribedToArrivalShouldReturnTrue() {
+        //Given
+        Principal principal = () -> EMAIL;
+        BOOK.setId(ID);
+        List<Subscription> subscriptions = new ArrayList<>();
+        subscriptions.add(SUBSCRIPTION);
+        CUSTOMER.setSubscriptions(subscriptions);
 
-        Mockito.doReturn(customer).when(customerDAO).readByEmail(email);
+        //When
+        Mockito.when(customerRepo.findByEmail(EMAIL)).thenReturn(Optional.of(CUSTOMER));
 
-        Assertions.assertFalse(customerService.isSubscribedToArrival(principal, book));
+        //Then
+        Assertions.assertTrue(customerService.isSubscribedToArrival(principal, BOOK));
     }
 
     @Test
-    void isSubscribedToArrivalReturnFalseWhenSubscribersListDoesNotContainsCustomerId() {
-        Principal principal = new JMXPrincipal(email);
-        Book book = new Book();
-        book.setSubscribersList(new ArrayList<>(List.of(id+1)));
+    void isSubscribedToArrivalShouldReturnFalseWhenPrincipalOrBookIsNull() {
+        //Given principal and book are null
+        //Then
+        Assertions.assertFalse(customerService.isSubscribedToArrival(null, null));
+    }
 
-        Mockito.doReturn(customer).when(customerDAO).readByEmail(email);
+    @Test
+    void isSubscribedToArrivalShouldReturnFalseWhenCustomerDoNotHaveAnySubscriptions() {
+        //Given
+        Principal principal = () -> EMAIL;
+        BOOK.setId(ID);
 
-        Assertions.assertFalse(customerService.isSubscribedToArrival(principal, book));
+        //When
+        Mockito.when(customerRepo.findByEmail(EMAIL)).thenReturn(Optional.of(CUSTOMER));
+
+        //Then
+        Assertions.assertFalse(customerService.isSubscribedToArrival(principal, BOOK));
+    }
+
+    @Test
+    void isSubscribedToArrivalShouldReturnFalseWhenCustomerDoNotSubscribedToThisBook() {
+        //Given
+        Principal principal = () -> EMAIL;
+        BOOK.setId(ID);
+        List<Subscription> subscriptions = new ArrayList<>();
+        subscriptions.add(SUBSCRIPTION);
+        CUSTOMER.setSubscriptions(subscriptions);
+        Book anotherBook = new Book();
+        anotherBook.setId(2L);
+
+        //When
+        Mockito.when(customerRepo.findByEmail(EMAIL)).thenReturn(Optional.of(CUSTOMER));
+
+        //Then
+        Assertions.assertFalse(customerService.isSubscribedToArrival(principal, anotherBook));
     }
 }
