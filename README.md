@@ -18,7 +18,6 @@ This app based on:
 - spring data JPA
 - postgreSQL
 - Flyway
-- Thymeleaf
 - Docker
 - JUnit 5
 - Mockito
@@ -44,5 +43,3 @@ It will download docker images, create docker containers and run the application
 
 Login for admin: *admin* <br/>
 Password: *admin*
-
-Also, you can just visit www.booksland.shop
