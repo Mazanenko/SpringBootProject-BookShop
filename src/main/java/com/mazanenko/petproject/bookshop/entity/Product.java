@@ -1,18 +1,25 @@
 package com.mazanenko.petproject.bookshop.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.Objects;
 
-@MappedSuperclass
-public abstract class Product {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "product_type", length = 150)
+@Entity
+@Table(name = "products")
+public abstract class Product extends BaseEntity {
 
     @NotBlank(message = "Should be not empty")
     @Column(name = "name")
@@ -30,59 +37,13 @@ public abstract class Product {
     @Column(name = "available_quantity")
     private int availableQuantity;
 
-
-
-    public Product() {
-    }
-
     public Product(Long id, String name, String description, int availableQuantity, int price) {
-        this.id = id;
+        super(id);
         this.name = name;
         this.description = description;
         this.availableQuantity = availableQuantity;
         this.price = price;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getAvailableQuantity() {
-        return availableQuantity;
-    }
-
-    public void setAvailableQuantity(int availableQuantity) {
-        this.availableQuantity = availableQuantity;
-    }
-
 
     @Override
     public String toString() {
@@ -97,14 +58,22 @@ public abstract class Product {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Product product = (Product) o;
-        return price == product.price && availableQuantity == product.availableQuantity && id.equals(product.id)
-                && name.equals(product.name) && Objects.equals(description, product.description);
+        if (!(o instanceof Product product)) return false;
+        if (!super.equals(o)) return false;
+
+        if (price != product.price) return false;
+        if (availableQuantity != product.availableQuantity) return false;
+        if (!Objects.equals(name, product.name)) return false;
+        return Objects.equals(description, product.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, price, description, availableQuantity);
+        int result = super.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + price;
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + availableQuantity;
+        return result;
     }
 }

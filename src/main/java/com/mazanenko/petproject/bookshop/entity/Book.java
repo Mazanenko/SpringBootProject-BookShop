@@ -1,16 +1,23 @@
 package com.mazanenko.petproject.bookshop.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "book")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@DiscriminatorValue("book")
 public class Book extends Product {
 
     @NotBlank(message = "Should be not empty")
@@ -22,17 +29,15 @@ public class Book extends Product {
     private String genre;
 
     @Pattern(regexp = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,4}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)",
-    message = "not valid URL")
+            message = "not valid URL")
     @Column(name = "photo_url")
     private String photoURL;
 
-    @OneToMany(mappedBy = "book")
-    private List<Order> orderList;
+    @OneToMany(mappedBy = "product")
+    private List<Order> orderList = new ArrayList<>();
 
     @OneToMany(mappedBy = "book")
-    private List<Subscription> subscribersList;
-
-    public Book() {}
+    private List<Subscription> subscribersList = new ArrayList<>();
 
     public Book(Long id, String name, String description, int availableQuantity, int price, String author,
                 String genre, String photoURL) {
@@ -42,45 +47,6 @@ public class Book extends Product {
         this.photoURL = photoURL;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    public String getPhotoURL() {
-        return photoURL;
-    }
-
-    public void setPhotoURL(String photoURL) {
-        this.photoURL = photoURL;
-    }
-
-    public List<Order> getOrderList() {
-        return orderList;
-    }
-
-    public void setOrderList(List<Order> orderList) {
-        this.orderList = orderList;
-    }
-
-    public List<Subscription> getSubscribersList() {
-        return subscribersList;
-    }
-
-    public void setSubscribersList(List<Subscription> subscribersList) {
-        this.subscribersList = subscribersList;
-    }
 
     @Override
     public String toString() {
@@ -94,15 +60,20 @@ public class Book extends Product {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Book book)) return false;
         if (!super.equals(o)) return false;
-        Book book = (Book) o;
-        return author.equals(book.author) && Objects.equals(genre, book.genre)
-                && Objects.equals(photoURL, book.photoURL);
+
+        if (!Objects.equals(author, book.author)) return false;
+        if (!Objects.equals(genre, book.genre)) return false;
+        return Objects.equals(photoURL, book.photoURL);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), author, genre, photoURL);
+        int result = super.hashCode();
+        result = 31 * result + (author != null ? author.hashCode() : 0);
+        result = 31 * result + (genre != null ? genre.hashCode() : 0);
+        result = 31 * result + (photoURL != null ? photoURL.hashCode() : 0);
+        return result;
     }
 }
