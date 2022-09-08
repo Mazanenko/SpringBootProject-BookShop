@@ -1,13 +1,20 @@
 package com.mazanenko.petproject.bookshop.entity;
 
+import com.mazanenko.petproject.bookshop.DTO.BookDto;
+import com.mazanenko.petproject.bookshop.DTO.ProductDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +24,8 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@DiscriminatorValue("book")
+@DiscriminatorValue(ProductType.Constants.BOOK)
+@DynamicUpdate
 public class Book extends Product {
 
     @NotBlank(message = "Should be not empty")
@@ -39,9 +47,9 @@ public class Book extends Product {
     @OneToMany(mappedBy = "book")
     private List<Subscription> subscribersList = new ArrayList<>();
 
-    public Book(Long id, String name, String description, int availableQuantity, int price, String author,
+    public Book(String name, String description, Integer availableQuantity, BigDecimal price, String author,
                 String genre, String photoURL) {
-        super(id, name, description, availableQuantity, price);
+        super(name, description, availableQuantity, price);
         this.author = author;
         this.genre = genre;
         this.photoURL = photoURL;
@@ -75,5 +83,15 @@ public class Book extends Product {
         result = 31 * result + (genre != null ? genre.hashCode() : 0);
         result = 31 * result + (photoURL != null ? photoURL.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public ProductDto getDto() {
+        return new BookDto();
+    }
+
+    @Override
+    public Class<BookDto> getDtoClass() {
+        return BookDto.class;
     }
 }

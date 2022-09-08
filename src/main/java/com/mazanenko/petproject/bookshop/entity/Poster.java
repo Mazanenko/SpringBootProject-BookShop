@@ -1,9 +1,12 @@
 package com.mazanenko.petproject.bookshop.entity;
 
+import com.mazanenko.petproject.bookshop.DTO.PosterDto;
+import com.mazanenko.petproject.bookshop.DTO.ProductDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -17,8 +20,9 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@DiscriminatorValue("poster")
-public class Poster extends Product{
+@DiscriminatorValue(ProductType.Constants.POSTER)
+@DynamicUpdate
+public class Poster extends Product {
     @Column(name = "theme")
     private String theme;
 
@@ -50,5 +54,15 @@ public class Poster extends Product{
         result = 31 * result + height;
         result = 31 * result + width;
         return result;
+    }
+
+    @Override
+    public ProductDto getDto() {
+        return new PosterDto();
+    }
+
+    @Override
+    public Class<PosterDto> getDtoClass() {
+        return PosterDto.class;
     }
 }

@@ -1,5 +1,6 @@
 package com.mazanenko.petproject.bookshop.entity;
 
+import com.mazanenko.petproject.bookshop.DTO.ProductDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Getter
@@ -19,7 +21,10 @@ import java.util.Objects;
 @DiscriminatorColumn(name = "product_type", length = 150)
 @Entity
 @Table(name = "products")
-public abstract class Product extends BaseEntity {
+public abstract class Product extends BaseEntity implements HasDto<ProductDto> {
+
+    @Column(name = "product_type", insertable = false, updatable = false)
+    private String productType;
 
     @NotBlank(message = "Should be not empty")
     @Column(name = "name")
@@ -27,7 +32,7 @@ public abstract class Product extends BaseEntity {
 
     @Min(value = 0, message = "Should be greater then zero")
     @Column(name = "price")
-    private int price;
+    private BigDecimal price;
 
     @NotBlank(message = "Should be not empty")
     @Column(name = "description")
@@ -35,10 +40,9 @@ public abstract class Product extends BaseEntity {
 
     @PositiveOrZero(message = "Should be positive or zero")
     @Column(name = "available_quantity")
-    private int availableQuantity;
+    private Integer availableQuantity;
 
-    public Product(Long id, String name, String description, int availableQuantity, int price) {
-        super(id);
+    public Product(String name, String description, Integer availableQuantity, BigDecimal price) {
         this.name = name;
         this.description = description;
         this.availableQuantity = availableQuantity;
@@ -61,19 +65,21 @@ public abstract class Product extends BaseEntity {
         if (!(o instanceof Product product)) return false;
         if (!super.equals(o)) return false;
 
-        if (price != product.price) return false;
-        if (availableQuantity != product.availableQuantity) return false;
-        if (!Objects.equals(name, product.name)) return false;
-        return Objects.equals(description, product.description);
+        if (!productType.equals(product.productType)) return false;
+        if (!name.equals(product.name)) return false;
+        if (!Objects.equals(price, product.price)) return false;
+        if (!Objects.equals(description, product.description)) return false;
+        return Objects.equals(availableQuantity, product.availableQuantity);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + price;
+        result = 31 * result + productType.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + (price != null ? price.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + availableQuantity;
+        result = 31 * result + (availableQuantity != null ? availableQuantity.hashCode() : 0);
         return result;
     }
 }
