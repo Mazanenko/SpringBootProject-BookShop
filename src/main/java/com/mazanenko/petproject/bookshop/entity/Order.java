@@ -1,9 +1,16 @@
 package com.mazanenko.petproject.bookshop.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "order_table")
 public class Order {
 
@@ -17,58 +24,21 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    private Book book;
+    private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
-    public Order() {
-    }
-
-    public Order(Cart cart, Book book, int quantity) {
+    public Order(Cart cart, Product product, int quantity) {
         this.cart = cart;
-        this.book = book;
+        this.product = product;
         this.quantity = quantity;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public void setBook(Book book) {
-        this.book = book;
-    }
-
-    public Cart getCart() {
-        return cart;
-    }
-
-    public void setCart(Cart cart) {
-        this.cart = cart;
     }
 
     @Override
     public String toString() {
         return "Order{" +
-                "cartId=" + cart.getId() +
-                ", bookId=" + book.getId() +
                 ", product quantity=" + getQuantity() +
                 '}';
     }

@@ -1,28 +1,29 @@
 package com.mazanenko.petproject.bookshop.service;
 
 import com.mazanenko.petproject.bookshop.entity.Order;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
 public interface OrderService {
 
-    void createOrder(Order order);
+    void createOrder(@NonNull Order order);
 
-    Order readOrder(Long orderId);
+    Order readOrder(@NonNull Long orderId);
 
-    Order readOrderByCartIdAndProductId(Long cartId, Long productId);
+    Order readOrderByCartIdAndProductId(@NonNull Long cartId, @NonNull Long productId);
 
     List<Order> readAllOrders();
 
-    List<Order> readALLOrdersByCartId(Long cartId);
+    List<Order> readALLOrdersByCartId(@NonNull Long cartId);
 
-    void updateOrder(Order updatedOrder);
+    void updateOrder(@NonNull Order updatedOrder);
 
-    void incrementOrderQuantity(Order order);
+    void incrementOrderQuantity(@NonNull Order order);
 
-    void decrementOrderQuantity(Order order);
+    void decrementOrderQuantity(@NonNull Order order);
 
-    void deleteOrder(Order order);
+    void deleteOrder(@NonNull Order order);
 
-    void deleteAllOrdersByCartId(Long cartId);
+    void deleteAllOrdersByCartId(@NonNull Long cartId);
 }

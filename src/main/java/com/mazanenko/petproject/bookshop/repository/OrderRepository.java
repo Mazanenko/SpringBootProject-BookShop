@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    Optional<Order> findByCart_IdAndBook_Id(Long cartId, Long bookId);
+    Optional<Order> findByCart_IdAndProduct_Id(Long cartId, Long bookId);
 
     List<Order> findAllByCart_Id(Long cartId);
 
