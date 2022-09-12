@@ -1,16 +1,16 @@
 package com.mazanenko.petproject.bookshop.entity.event;
 
-import com.mazanenko.petproject.bookshop.entity.Book;
+import com.mazanenko.petproject.bookshop.entity.Product;
 
 public class ProductArrivalEvent {
-    private final Book book;
+    private final Product product;
 
 
-    public ProductArrivalEvent(Book book) {
-        this.book = book;
+    public ProductArrivalEvent(Product product) {
+        this.product = product;
     }
 
-    public Book getBook() {
-        return book;
+    public Product getProduct() {
+        return product;
     }
 }
