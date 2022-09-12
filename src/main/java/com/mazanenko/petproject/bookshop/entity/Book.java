@@ -44,9 +44,6 @@ public class Book extends Product {
     @OneToMany(mappedBy = "product")
     private List<Order> orderList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "book")
-    private List<Subscription> subscribersList = new ArrayList<>();
-
     public Book(String name, String description, Integer availableQuantity, BigDecimal price, String author,
                 String genre, String photoURL) {
         super(name, description, availableQuantity, price);

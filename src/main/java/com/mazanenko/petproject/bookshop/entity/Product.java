@@ -11,6 +11,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -41,6 +43,9 @@ public abstract class Product extends BaseEntity implements HasDto<ProductDto> {
     @PositiveOrZero(message = "Should be positive or zero")
     @Column(name = "available_quantity")
     private Integer availableQuantity;
+
+    @OneToMany(mappedBy = "product")
+    private List<Subscription> subscribersList = new ArrayList<>();
 
     public Product(String name, String description, Integer availableQuantity, BigDecimal price) {
         this.name = name;
