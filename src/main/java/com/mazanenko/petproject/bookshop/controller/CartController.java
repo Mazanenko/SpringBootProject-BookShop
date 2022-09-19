@@ -1,161 +1,102 @@
 package com.mazanenko.petproject.bookshop.controller;
 
-import com.mazanenko.petproject.bookshop.entity.Cart;
-import com.mazanenko.petproject.bookshop.service.BookService;
+import com.mazanenko.petproject.bookshop.DTO.CartDto;
 import com.mazanenko.petproject.bookshop.service.CartService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mazanenko.petproject.bookshop.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.sql.SQLException;
 
-@Controller
+@RestController
+@RequiredArgsConstructor
 @RequestMapping("/cart")
 public class CartController {
     private final CartService cartService;
-    private final BookService bookService;
-
-    @Autowired
-    public CartController(CartService cartService, BookService bookService) {
-        this.cartService = cartService;
-        this.bookService = bookService;
-    }
+    private final ProductService productService;
 
     @GetMapping("/{customerId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String showCart(@PathVariable("customerId") Long customerId, Model model) {
-        model.addAttribute("cart", cartService.getCartByCustomerId(customerId));
-        return "/cart/show-cart";
+    public ResponseEntity<CartDto> getCart(@PathVariable("customerId") Long customerId) {
+        return ResponseEntity.ok(cartService.getCartByCustomerId(customerId));
     }
 
     @GetMapping()
     @Secured("ROLE_CUSTOMER")
-    public String showCartForCustomer(Principal principal, ModelMap model) {
-        model.addAttribute("cart", cartService.getCartByCustomerEmail(principal.getName()));
-        return "/cart/show-cart";
+    public ResponseEntity<CartDto> getCartForCustomer(Principal principal) {
+        return ResponseEntity.ok(cartService.getCartByCustomerEmail(principal.getName()));
     }
 
-    @GetMapping("/{cartId}-add-book")
+    @PostMapping("/{customerId}/addProduct/{productId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String addBookToCustomer(@PathVariable("cartId") Long cartId, ModelMap model) {
-        model.addAttribute("books", bookService.getAllBooks());
-        model.addAttribute("cart", cartService.getCartById(cartId));
-        return "/books/list";
+    public ResponseEntity<CartDto> addProductToCartForManager(@PathVariable("productId") Long productId,
+                                                              @PathVariable("customerId") Long customerId) {
+        return ResponseEntity.ok(cartService.addToCartByCustomerId(customerId, productId));
     }
 
-    @PostMapping("/{customerId}/add-{bookId}")
+
+    @PostMapping("/addProduct/{productId}")
+    @Secured("ROLE_CUSTOMER")
+    public ResponseEntity<CartDto> addToCartForCustomer(@PathVariable("productId") Long productId,
+                                                        Principal principal) {
+
+        if (productService.isProductAvailable(productId)) {
+            return ResponseEntity.ok(cartService.addToCartByCustomerEmail(principal.getName(), productId));
+        } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                String.format("Product with id: %d does not available", productId));
+    }
+
+    @PatchMapping("/incrementOrderQuantity/{orderId}")
+    @Secured("ROLE_CUSTOMER")
+    public ResponseEntity<CartDto> incrementProductInOrderForCustomer(@PathVariable("orderId") Long orderId,
+                                                                      Principal principal) {
+        return ResponseEntity.ok(cartService.incrementProductInOrderByCustomerEmail(principal.getName(), orderId));
+    }
+
+    @PatchMapping("/{customerId}/incrementOrderQuantity/{orderId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String addToCartForManager(@PathVariable("bookId") Long bookId,
-                                      @PathVariable("customerId") Long customerId) {
-
-        try {
-            cartService.addToCartByCustomerId(customerId, bookId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return String.format("redirect:/cart/%s", customerId);
+    public ResponseEntity<CartDto> incrementProductInOrderForManager(@PathVariable("orderId") Long orderId,
+                                                                     @PathVariable("customerId") Long customerId) {
+        return ResponseEntity.ok(cartService.incrementProductInOrderByCustomerId(customerId, orderId));
     }
 
-
-    @PostMapping("/add-{bookId}")
+    @PatchMapping("/decrementOrderQuantity/{orderId}")
     @Secured("ROLE_CUSTOMER")
-    public String addToCartForCustomer(@PathVariable("bookId") Long bookId, Principal principal) {
-
-        if (bookService.isBookAvailable(bookId)) {
-            try {
-                cartService.addToCartByCustomerEmail(principal.getName(), bookId);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return "redirect:/cart";
-        }
-        return "redirect:/books";
+    public ResponseEntity<CartDto> decrementProductInOrderForCustomer(@PathVariable("orderId") Long orderId,
+                                                                      Principal principal) {
+        return ResponseEntity.ok(cartService.decrementProductInOrderByCustomerEmail(principal.getName(), orderId));
     }
 
-    @PatchMapping("/increment-{bookId}")
-    @Secured("ROLE_CUSTOMER")
-    public String incrementProductForCustomer(@PathVariable("bookId") Long bookId, Principal principal,
-                                              ModelMap modelMap) {
-
-        Cart cart = cartService.getCartByCustomerEmail(principal.getName());
-
-        try {
-            cartService.incrementProduct(bookId, cart);
-            return "redirect:/cart";
-        } catch (SQLException e) {
-            // not good enough. Need to change alert in view to sth else
-            modelMap.addAttribute("cart", cart);
-            modelMap.addAttribute("error", "No more available books");
-            return "/cart/show-cart";
-        }
-    }
-
-    @PatchMapping("/{customerId}/increment-{bookId}")
+    @PatchMapping("/{customerId}/decrementOrderQuantity/{orderId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String incrementProductForManager(@PathVariable("bookId") Long bookId,
-                                             @PathVariable("customerId") Long customerId, ModelMap modelMap) {
-
-        Cart cart = cartService.getCartByCustomerId(customerId);
-
-        try {
-            cartService.incrementProduct(bookId, cart);
-            return "redirect:/cart/{customerId}";
-        } catch (SQLException e) {
-            // not good enough. Need to change alert in view to sth else
-            modelMap.addAttribute("cart", cart);
-            modelMap.addAttribute("error", "No more available books");
-            return "/cart/show-cart";
-        }
+    public ResponseEntity<CartDto> decrementProductInOrderForManager(@PathVariable("orderId") Long orderId,
+                                                                     @PathVariable("customerId") Long customerId) {
+        return ResponseEntity.ok(cartService.decrementProductInOrderByCustomerId(customerId, orderId));
     }
 
-    @PatchMapping("/decrement-{bookId}")
+    @DeleteMapping("/delete/{orderId}")
     @Secured("ROLE_CUSTOMER")
-    public String decrementProductForCustomer(@PathVariable("bookId") Long bookId, Principal principal) {
-
-        Cart cart = cartService.getCartByCustomerEmail(principal.getName());
-        cartService.decrementProduct(bookId, cart);
-        return "redirect:/cart";
+    public ResponseEntity<?> deleteFromCartForCustomer(@PathVariable("orderId") Long orderId,
+                                                       Principal principal) {
+        cartService.deleteOrderFromCartByCustomerEmail(orderId, principal.getName());
+        return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{customerId}/decrement-{bookId}")
+    @DeleteMapping("/{customerId}/delete/{orderId}")
     @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String decrementProductForManager(@PathVariable("bookId") Long bookId,
-                                             @PathVariable("customerId") Long customerId) {
-
-        Cart cart = cartService.getCartByCustomerId(customerId);
-        cartService.decrementProduct(bookId, cart);
-        return "redirect:/cart/{customerId}";
+    public ResponseEntity<?> deleteFromCartForManager(@PathVariable("customerId") Long customerId,
+                                                      @PathVariable("orderId") Long orderId) {
+        cartService.deleteOrderFromCartByCustomerId(orderId, customerId);
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/delete-{bookId}")
+    @PatchMapping("/makeOrder")
     @Secured("ROLE_CUSTOMER")
-    public String deleteFromCartForCustomer(@PathVariable("bookId") Long bookId, Principal principal) {
-        Cart cart = cartService.getCartByCustomerEmail(principal.getName());
-        cartService.deleteOrderFromCart(bookId, cart);
-        return "redirect:/cart";
+    public ResponseEntity<CartDto> makeAnOrder(Principal principal) {
+        return ResponseEntity.ok(cartService.makeAnOrderByCustomerEmail(principal.getName()));
     }
-
-    @DeleteMapping("/{customerId}/delete-{bookId}")
-    @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
-    public String deleteFromCartForManager(@PathVariable("customerId") Long customerId,
-                                           @PathVariable("bookId") Long bookId) {
-
-        Cart cart = cartService.getCartByCustomerId(customerId);
-        cartService.deleteOrderFromCart(bookId, cart);
-        return "redirect:/cart/{customerId}";
-    }
-
-
-    @PatchMapping("/order")
-    @Secured("ROLE_CUSTOMER")
-    public String makeAnOrder(Principal principal) {
-
-        cartService.makeAnOrderByCustomerEmail(principal.getName());
-        return "redirect:/";
-    }
-
 }

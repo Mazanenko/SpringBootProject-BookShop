@@ -15,9 +15,9 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -42,7 +42,7 @@ public class Book extends Product {
     private String photoURL;
 
     @OneToMany(mappedBy = "product")
-    private List<Order> orderList = new ArrayList<>();
+    private Set<Order> orderList = new HashSet<>();
 
     public Book(String name, String description, Integer availableQuantity, BigDecimal price, String author,
                 String genre, String photoURL) {

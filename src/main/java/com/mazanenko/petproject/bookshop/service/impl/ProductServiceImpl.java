@@ -6,7 +6,7 @@ import com.mazanenko.petproject.bookshop.entity.Product;
 import com.mazanenko.petproject.bookshop.entity.event.ProductArrivalEvent;
 import com.mazanenko.petproject.bookshop.repository.ProductRepository;
 import com.mazanenko.petproject.bookshop.service.ProductService;
-import com.mazanenko.petproject.bookshop.utill.ProductMapper;
+import com.mazanenko.petproject.bookshop.utill.modelMapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;

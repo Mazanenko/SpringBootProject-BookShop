@@ -1,9 +1,9 @@
-package com.mazanenko.petproject.bookshop.utill.impl;
+package com.mazanenko.petproject.bookshop.utill.modelMapper.impl;
 
 import com.mazanenko.petproject.bookshop.DTO.ProductDto;
 import com.mazanenko.petproject.bookshop.entity.Product;
 import com.mazanenko.petproject.bookshop.entity.factory.ProductFactory;
-import com.mazanenko.petproject.bookshop.utill.ProductMapper;
+import com.mazanenko.petproject.bookshop.utill.modelMapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

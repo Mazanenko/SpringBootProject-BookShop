@@ -11,9 +11,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -45,7 +45,7 @@ public abstract class Product extends BaseEntity implements HasDto<ProductDto> {
     private Integer availableQuantity;
 
     @OneToMany(mappedBy = "product")
-    private List<Subscription> subscribersList = new ArrayList<>();
+    private Set<Subscription> subscribers = new HashSet<>();
 
     public Product(String name, String description, Integer availableQuantity, BigDecimal price) {
         this.name = name;
